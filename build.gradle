@@ -1,0 +1,192 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+    }
+}
+
+// apply Gradle plugins
+plugins {
+    id 'java'
+    id 'maven'
+    id 'eclipse'
+    id 'idea'
+    id 'checkstyle'
+    id 'com.github.johnrengelman.shadow' version '1.2.0'
+}
+
+apply plugin: 'license'
+
+defaultTasks 'clean', 'licenseFormat', 'build', 'shadowJar'
+
+// Project information
+group = 'net.caseif.flint.common'
+version = '1.0.0-SNAPSHOT'
+
+// Extended project information
+ext.projectName = 'flintcommon'
+ext.description = 'Code shared across implementations of Flint.'
+ext.inceptionYear = '2015'
+ext.packaging = 'jar'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+configurations {
+    shadow
+    compile {
+        extendsFrom shadow
+    }
+    deployerJars
+}
+
+// Project repositories
+repositories {
+    mavenCentral()
+    maven { url 'http://repo.caseif.net/content/groups/public/' }
+}
+
+ext {
+    author = 'Max Roncacé'
+
+    versionSuffix = version.contains('SNAPSHOT') ? (
+        (
+            System.getenv('GIT_COMMIT') ? ('-git('
+            + (System.getenv('GIT_BRANCH').contains('/')
+                    ? System.getenv('GIT_BRANCH').split('/')[1]
+                    : System.getenv('GIT_BRANCH')) + '-'
+            + System.getenv('GIT_COMMIT').substring(0, 7) + ')') : ''
+        )
+        + (System.getenv('BUILD_NUMBER') ? '-jnks' + System.getenv('BUILD_NUMBER') : '')
+    ) : ''
+
+    // to update, visit http://repo.caseif.net/content/groups/public/net/caseif/flint/flint/
+    flintVersion = '1.0-20150510.192051-25'
+
+    guava = 'com.google.guava:guava:17.0'
+    flint = 'net.caseif.flint:flint:' + flintVersion
+}
+
+// Project dependencies
+dependencies {
+    compile guava
+    shadow flint
+
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.8'
+}
+
+// Read source files using UTF-8
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    classifier = 'base'
+}
+
+jar.manifest.mainAttributes(
+        'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+        'Specification-Title': 'Flint',
+        'Specification-Version': flintVersion,
+        'Specification-Vendor': 'Max Roncacé',
+        'Implementation-Title': name,
+        'Implementation-Version': version + versionSuffix,
+        'Implementation-Vendor': author
+)
+
+processResources {
+    from 'LICENSE'
+}
+
+// License header formatting
+license {
+    header file('LICENSE')
+    excludes([
+            '**/*.properties',
+            '**/*.yml'
+    ])
+    sourceSets = project.sourceSets
+    ignoreFailures false
+    strictCheck true
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}
+
+// check code style
+checkstyle {
+    configProperties = [
+            'name'        : project.name,
+            'year'        : project.inceptionYear
+    ]
+    configFile = file('etc/checkstyle.xml')
+}
+
+tasks.withType(Checkstyle){
+    exclude '**/*.properties'
+    exclude '**/*.yml'
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    dependencies {
+        exclude dependency('com.google.guava:guava')
+        exclude dependency('org.bukkit:bukkit')
+    }
+    classifier = ''
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.java
+    from sourceSets.main.resources
+    classifier = 'sources'
+}
+
+artifacts {
+    archives shadowJar
+    archives sourceJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        setUniqueVersion(true)
+        configuration = configurations.deployerJars
+        if (project.hasProperty('mavenRepo')) {
+            repository(url: project.property('mavenRepo')) {
+                authentication(userName: project.property('mavenUser'), password: project.property('mavenPass'))
+            }
+        }
+
+        pom {
+            groupId = project.group
+            version = project.version
+            artifactId = project.ext.projectName
+            project {
+                packaging 'jar'
+                description project.ext.description
+                url 'http://github.com/caseif/FlintCommon'
+
+                scm {
+                    url 'https://github.com/caseif/FlintCommon'
+                    connection 'scm:git:git://github.com/caseif/FlintCommon.git'
+                    developerConnection 'scm:git:git@github.com:caseif/FlintCommon.git'
+                }
+
+                licenses {
+                    license {
+                        name 'BSD 3-Clause'
+                        url 'http://opensource.org/licenses/BSD-3-clause'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }
+    }
+}
