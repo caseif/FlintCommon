@@ -46,12 +46,12 @@ import java.util.UUID;
  */
 public abstract class CommonChallenger extends CommonMetadatable implements Challenger {
 
-    private UUID uuid;
-    private String name;
-    private CommonRound round;
+    protected UUID uuid;
+    protected String name;
+    protected CommonRound round;
 
-    private Team team;
-    private boolean spectating = false;
+    protected Team team;
+    protected boolean spectating = false;
 
     /**
      * Checks the state of this {@link CommonChallenger} object.
@@ -59,7 +59,7 @@ public abstract class CommonChallenger extends CommonMetadatable implements Chal
      * @throws IllegalStateException If this object is no longer contained by a
      *                               {@link Round}
      */
-    private void checkState() throws IllegalStateException {
+    protected void checkState() throws IllegalStateException {
         if (round == null) {
             throw new IllegalStateException("Challenger is no longer in a round");
         }

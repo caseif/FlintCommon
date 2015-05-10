@@ -49,12 +49,12 @@ import java.util.Map;
 //TODO: no persistance yet, need to work on that
 public class CommonArena extends CommonMetadatable implements Arena {
 
-    private CommonMinigame parent;
-    private String id;
-    private String name;
-    private String world;
-    private HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
-    private Boundary boundary = null;
+    protected CommonMinigame parent;
+    protected String id;
+    protected String name;
+    protected String world;
+    protected HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
+    protected Boundary boundary = null;
 
     public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn) {
         this.parent = parent;

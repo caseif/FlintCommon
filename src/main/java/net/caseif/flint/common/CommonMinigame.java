@@ -52,8 +52,8 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    private Map<ConfigNode<?>, Object> configValues = new HashMap<>();
-    private BiMap<String, Arena> arenas = HashBiMap.create();
+    protected Map<ConfigNode<?>, Object> configValues = new HashMap<>();
+    protected BiMap<String, Arena> arenas = HashBiMap.create();
     BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
 
     @Override

@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public abstract class CommonCore extends FlintCore {
 
-    private Map<String, Minigame> minigames = new HashMap<>();
+    protected Map<String, Minigame> minigames = new HashMap<>();
 
     public Map<String, Minigame> getMinigames() {
         return minigames;

@@ -46,11 +46,11 @@ import java.util.Set;
  */
 public class CommonTeam extends CommonMetadatable implements Team {
 
-    private String id;
-    private Round round;
+    protected String id;
+    protected Round round;
 
-    private String name;
-    private Set<Challenger> challengers = new HashSet<>();
+    protected String name;
+    protected Set<Challenger> challengers = new HashSet<>();
 
     public CommonTeam(String id, Round round) throws IllegalArgumentException {
         if (round.getTeam(id).isPresent()) {

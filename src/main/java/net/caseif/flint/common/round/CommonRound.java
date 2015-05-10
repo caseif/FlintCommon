@@ -59,15 +59,15 @@ import java.util.UUID;
  */
 public abstract class CommonRound extends CommonMetadatable implements Round {
 
-    private CommonArena arena;
+    protected CommonArena arena;
 
-    private BiMap<UUID, Challenger> challengers = HashBiMap.create();
-    private BiMap<String, Team> teams = HashBiMap.create();
-    private HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
+    protected BiMap<UUID, Challenger> challengers = HashBiMap.create();
+    protected BiMap<String, Team> teams = HashBiMap.create();
+    protected HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
 
-    private ArrayList<LifecycleStage> stages = new ArrayList<>();
-    private int currentStage = 0;
-    private long time;
+    protected ArrayList<LifecycleStage> stages = new ArrayList<>();
+    protected int currentStage = 0;
+    protected long time;
 
     public int spectators;
 
