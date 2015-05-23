@@ -46,7 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Implementation of {@link Minigame}.
+ * Implements {@link Minigame}.
  *
  * @author Max Roncacé
  */
@@ -78,11 +78,6 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public Arena createArena(String id, Location3D spawnPoint) throws IllegalArgumentException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Set<Round> getRounds() {
         return rounds.values();
     }
@@ -109,5 +104,17 @@ public abstract class CommonMinigame implements Minigame {
     @Override
     public LocaleManager getLocaleManager() {
         throw new UnsupportedOperationException(); //TODO
+    }
+
+    public Map<ConfigNode<?>, Object> getConfigMap() {
+        return configValues;
+    }
+
+    public Map<String, Arena> getArenaMap() {
+        return arenas;
+    }
+
+    public Map<Arena, Round> getRoundMap() {
+        return rounds;
     }
 }

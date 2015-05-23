@@ -28,6 +28,7 @@
  */
 package net.caseif.flint.common;
 
+import net.caseif.flint.common.round.CommonRound;
 import net.caseif.flint.common.util.CommonMetadatable;
 
 import com.google.common.base.Optional;
@@ -42,12 +43,12 @@ import net.caseif.flint.util.physical.Location3D;
 import java.util.Map;
 
 /**
- * Implementation of {@link Arena}.
+ * Implements {@link Arena}.
  *
  * @author Max Roncacé
  */
 //TODO: no persistance yet, need to work on that
-public class CommonArena extends CommonMetadatable implements Arena {
+public abstract class CommonArena extends CommonMetadatable implements Arena {
 
     protected CommonMinigame parent;
     protected String id;
@@ -124,11 +125,6 @@ public class CommonArena extends CommonMetadatable implements Arena {
     @Override
     public Optional<Round> getRound() {
         return Optional.fromNullable(parent.rounds.get(this));
-    }
-
-    @Override
-    public Round createRound() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The implementation of {@link FlintCore}.
+ * Implements {@link FlintCore}.
  *
  * @author Max Roncacé
  */

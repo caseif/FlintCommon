@@ -44,7 +44,7 @@ import java.util.UUID;
  *
  * @author Max Roncacé
  */
-public abstract class CommonChallenger extends CommonMetadatable implements Challenger {
+public class CommonChallenger extends CommonMetadatable implements Challenger {
 
     protected UUID uuid;
     protected String name;
