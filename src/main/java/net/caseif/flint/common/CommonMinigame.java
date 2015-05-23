@@ -54,7 +54,7 @@ public abstract class CommonMinigame implements Minigame {
 
     protected Map<ConfigNode<?>, Object> configValues = new HashMap<>();
     protected BiMap<String, Arena> arenas = HashBiMap.create();
-    BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
+    protected BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
 
     @Override
     @SuppressWarnings("unchecked") // only mutable through setConfigValue(), which guarantees types match
