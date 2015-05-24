@@ -64,7 +64,7 @@ ext {
     ) : ''
 
     // to update, visit http://repo.caseif.net/content/groups/public/net/caseif/flint/flint/
-    flintVersion = '1.0-20150510.192051-25'
+    flintVersion = '1.0-20150523.202335-26'
 
     guava = 'com.google.guava:guava:17.0'
     flint = 'net.caseif.flint:flint:' + flintVersion
