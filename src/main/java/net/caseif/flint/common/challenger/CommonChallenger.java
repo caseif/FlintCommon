@@ -28,8 +28,8 @@
  */
 package net.caseif.flint.common.challenger;
 
-import net.caseif.flint.common.util.CommonMetadatable;
 import net.caseif.flint.common.round.CommonRound;
+import net.caseif.flint.common.util.CommonMetadatable;
 
 import com.google.common.base.Optional;
 import net.caseif.flint.Minigame;

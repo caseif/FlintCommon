@@ -28,7 +28,6 @@
  */
 package net.caseif.flint.common;
 
-import net.caseif.flint.common.round.CommonRound;
 import net.caseif.flint.common.util.CommonMetadatable;
 
 import com.google.common.base.Optional;
