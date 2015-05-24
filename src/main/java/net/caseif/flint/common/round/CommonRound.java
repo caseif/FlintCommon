@@ -49,6 +49,7 @@ import net.caseif.flint.round.Round;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -239,5 +240,13 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     @Override
     public String getPlugin() {
         return getArena().getPlugin();
+    }
+
+    public Map<UUID, Challenger> getChallengerMap() {
+        return challengers;
+    }
+
+    public Map<String, Team> getTeamMap() {
+        return teams;
     }
 }
