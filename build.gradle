@@ -63,7 +63,6 @@ ext {
         + (System.getenv('BUILD_NUMBER') ? '-jnks' + System.getenv('BUILD_NUMBER') : '')
     ) : ''
 
-    // to update, visit http://repo.caseif.net/content/groups/public/net/caseif/flint/flint/
     flintVersion = '1.0-SNAPSHOT'
 
     guava = 'com.google.guava:guava:17.0'
