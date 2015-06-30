@@ -28,24 +28,27 @@
  */
 package net.caseif.flint.common.round;
 
+import net.caseif.flint.Arena;
+import net.caseif.flint.Minigame;
+import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
 import net.caseif.flint.common.util.CommonMetadatable;
+import net.caseif.flint.config.RoundConfigNode;
+import net.caseif.flint.locale.Localizable;
+import net.caseif.flint.round.LifecycleStage;
+import net.caseif.flint.round.Round;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
-import net.caseif.flint.Arena;
-import net.caseif.flint.Minigame;
-import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.challenger.Team;
-import net.caseif.flint.config.RoundConfigNode;
-import net.caseif.flint.locale.Localizable;
-import net.caseif.flint.round.LifecycleStage;
-import net.caseif.flint.round.Round;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -66,14 +69,22 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     protected BiMap<String, Team> teams = HashBiMap.create();
     protected HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
 
-    protected ImmutableBiMap<String, LifecycleStage> stages = ImmutableBiMap.of();
+    protected final ImmutableBiMap<String, LifecycleStage> stages;
     protected int currentStage = 0;
     protected long time;
 
     public int spectators;
 
-    public CommonRound(CommonArena arena) {
+    public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         this.arena = arena;
+        // admittedly not the most elegant solution, but it SHOULD work
+        this.stages = ImmutableBiMap.<String, LifecycleStage>builder().putAll(
+                Maps.uniqueIndex(stages, new Function<LifecycleStage, String>() {
+                    public String apply(LifecycleStage stage) {
+                        return stage.getId();
+                    }
+                })
+        ).build();
     }
 
     @Override
@@ -95,7 +106,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public void removeChallenger(UUID uuid) throws IllegalArgumentException {
         Challenger c = challengers.get(uuid);
         if (c == null) {
-            throw new IllegalArgumentException("Cannot get Challenger from UUID");
+            throw new IllegalArgumentException("Could not get challenger from UUID");
         }
         removeChallenger(c);
     }
@@ -106,7 +117,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
             challengers.remove(challenger.getUniqueId(), challenger);
             ((CommonChallenger)challenger).invalidate();
         } else {
-            throw new IllegalArgumentException("Cannot remove Challenger: round mismatch");
+            throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
     }
 
@@ -123,7 +134,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     @Override
     public Team createTeam(String id) throws IllegalArgumentException {
         if (teams.containsKey(id)) {
-            throw new IllegalArgumentException("Team \"" + id + "\"already exists");
+            throw new IllegalArgumentException("Team \"" + id + "\" already exists");
         }
         return new CommonTeam(id, this);
     }
@@ -145,12 +156,12 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void broadcast(String message) {
-        throw new UnsupportedOperationException(); //TODO
+        throw new NotImplementedException("TODO"); //TODO
     }
 
     @Override
     public void broadcast(Localizable message) {
-        throw new UnsupportedOperationException(); //TODO
+        throw new NotImplementedException("TODO"); //TODO
     }
 
     @Override
@@ -196,8 +207,8 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public Optional<LifecycleStage> getNextLifecycleStage() {
         return Optional.fromNullable(
                 currentStage < stages.size() - 1
-                ? (LifecycleStage)getLifecycleStages().toArray()[currentStage]
-                : null
+                        ? (LifecycleStage)getLifecycleStages().toArray()[currentStage]
+                        : null
         );
     }
 
@@ -225,7 +236,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void rollback() {
-        throw new UnsupportedOperationException(); //TODO
+        throw new NotImplementedException("TODO"); //TODO
     }
 
     @Override
@@ -238,7 +249,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         if (rollback) {
             rollback();
         }
-        throw new UnsupportedOperationException(); //TODO
+        throw new NotImplementedException("TODO"); //TODO
     }
 
     @Override

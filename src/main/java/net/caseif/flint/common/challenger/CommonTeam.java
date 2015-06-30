@@ -28,13 +28,13 @@
  */
 package net.caseif.flint.common.challenger;
 
-import net.caseif.flint.common.util.CommonMetadatable;
-
-import com.google.common.collect.ImmutableSet;
 import net.caseif.flint.Minigame;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
+import net.caseif.flint.common.util.CommonMetadatable;
 import net.caseif.flint.round.Round;
+
+import com.google.common.collect.ImmutableSet;
 
 import java.util.HashSet;
 import java.util.Set;
