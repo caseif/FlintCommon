@@ -31,7 +31,6 @@ package net.caseif.flint.common;
 import net.caseif.flint.Arena;
 import net.caseif.flint.Minigame;
 import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.common.event.service.EventDispatcher;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.locale.LocaleManager;
 import net.caseif.flint.round.Round;
@@ -39,6 +38,7 @@ import net.caseif.flint.round.Round;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
@@ -54,6 +54,8 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
+    private EventBus eventBus = new EventBus();
+
     protected Map<ConfigNode<?>, Object> configValues = new HashMap<>();
     protected BiMap<String, Arena> arenas = HashBiMap.create();
     protected BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
@@ -65,8 +67,8 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public void addEventListener(Class<?> listenerClass) {
-        EventDispatcher.addEventListener(this, listenerClass);
+    public EventBus getEventBus() {
+        return eventBus;
     }
 
     @Override

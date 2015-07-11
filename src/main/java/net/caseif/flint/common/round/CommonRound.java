@@ -35,6 +35,7 @@ import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
+import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.util.CommonMetadatable;
 import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.locale.Localizable;
@@ -219,6 +220,20 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void setTime(long time) {
+        setTime(time, true);
+    }
+
+    /**
+     * Sets the time of this {@link Round}.
+     *
+     * @param time The new time of the {@link Round}
+     * @param callEvent Whether an event should be posted
+     */
+    public void setTime(long time, boolean callEvent) {
+        if (callEvent) {
+            CommonRoundTimerChangeEvent event = new CommonRoundTimerChangeEvent(this, this.getTime(), time);
+            getMinigame().getEventBus().post(event);
+        }
         this.time = time;
     }
 
