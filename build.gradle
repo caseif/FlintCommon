@@ -74,7 +74,7 @@ dependencies {
     compile guava
     shadow flint
 
-    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.8'
+    deployerJars 'org.apache.maven.wagon:wagon-ssh:2.9'
 }
 
 // Read source files using UTF-8
