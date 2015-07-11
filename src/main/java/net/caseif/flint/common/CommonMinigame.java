@@ -31,6 +31,7 @@ package net.caseif.flint.common;
 import net.caseif.flint.Arena;
 import net.caseif.flint.Minigame;
 import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.common.event.service.EventDispatcher;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.locale.LocaleManager;
 import net.caseif.flint.round.Round;
@@ -65,7 +66,7 @@ public abstract class CommonMinigame implements Minigame {
 
     @Override
     public void addEventListener(Class<?> listenerClass) {
-
+        EventDispatcher.addEventListener(this, listenerClass);
     }
 
     @Override
