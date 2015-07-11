@@ -64,6 +64,11 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
+    public void addEventListener(Class<?> listenerClass) {
+
+    }
+
+    @Override
     public <T> void setConfigValue(ConfigNode<T> node, T value) {
         configValues.put(node, value);
     }
