@@ -50,4 +50,5 @@ public class CommonRoundEvent extends CommonEvent implements RoundEvent {
     public Round getRound() {
         return this.round;
     }
+
 }

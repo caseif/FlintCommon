@@ -54,4 +54,5 @@ public class CommonRoundTimerStopEvent extends CommonRoundEvent implements Round
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
+
 }

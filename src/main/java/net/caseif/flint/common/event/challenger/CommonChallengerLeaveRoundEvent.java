@@ -38,21 +38,10 @@ import net.caseif.flint.event.challenger.ChallengerLeaveRoundEvent;
  * @author Max Roncacé
  */
 public class CommonChallengerLeaveRoundEvent extends CommonChallengerEvent
-        implements ChallengerLeaveRoundEvent, Cancellable {
-
-    private boolean cancelled = false;
+        implements ChallengerLeaveRoundEvent {
 
     public CommonChallengerLeaveRoundEvent(Challenger challenger) {
         super(challenger);
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
 }

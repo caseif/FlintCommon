@@ -135,4 +135,5 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
     public String getPlugin() {
         return parent.getPlugin();
     }
+
 }

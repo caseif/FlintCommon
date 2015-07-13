@@ -295,4 +295,5 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public Map<String, Team> getTeamMap() {
         return teams;
     }
+
 }

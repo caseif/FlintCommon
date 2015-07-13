@@ -55,4 +55,5 @@ public class CommonChallengerJoinRoundEvent extends CommonChallengerEvent
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
+
 }

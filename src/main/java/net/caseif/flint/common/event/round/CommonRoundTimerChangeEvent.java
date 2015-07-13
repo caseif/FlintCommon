@@ -58,4 +58,5 @@ public class CommonRoundTimerChangeEvent extends CommonRoundEvent implements Rou
     public long getNewTime() {
         return newTime;
     }
+
 }

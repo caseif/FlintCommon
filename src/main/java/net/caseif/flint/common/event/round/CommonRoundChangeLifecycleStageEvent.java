@@ -57,4 +57,5 @@ public class CommonRoundChangeLifecycleStageEvent extends CommonRoundEvent imple
     public LifecycleStage getStageAfter() {
         return after;
     }
+
 }

@@ -132,4 +132,5 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
         checkState();
         return round.getPlugin();
     }
+
 }

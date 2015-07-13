@@ -128,4 +128,5 @@ public abstract class CommonMinigame implements Minigame {
     public Map<Arena, Round> getRoundMap() {
         return rounds;
     }
+
 }

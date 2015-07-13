@@ -49,4 +49,5 @@ public class CommonRoundEndEvent extends CommonRoundEvent implements RoundEndEve
     public boolean isNatural() {
         return natural;
     }
+
 }

@@ -100,4 +100,5 @@ public class CommonTeam extends CommonMetadatable implements Team {
     public String getPlugin() {
         return getRound().getPlugin();
     }
+
 }

@@ -54,4 +54,5 @@ public class CommonRoundTimerStartEvent extends CommonRoundEvent implements Roun
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
+
 }
