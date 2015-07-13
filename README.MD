@@ -23,7 +23,7 @@ Please remember that FlintCommon should follow Flint's specification precisely o
 
 ### Who do I talk to? ###
 
-I can be contacted [via email at caseif@caseif.net](mailto:caseif@caseif.net).
+I can be contacted [via email at me@caseif.net](mailto:me@caseif.net).
 
 ### Copyright ###
 
