@@ -30,6 +30,7 @@ package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
 import net.caseif.flint.Minigame;
+import net.caseif.flint.common.util.PlatformUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,8 @@ import java.util.Map;
 public abstract class CommonCore extends FlintCore {
 
     protected static Map<String, Minigame> minigames = new HashMap<>();
+
+    public static PlatformUtils PLATFORM_UTILS;
 
     public static Map<String, Minigame> getMinigames() {
         return minigames;
