@@ -35,6 +35,7 @@ import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
+import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.util.CommonMetadatable;
@@ -71,7 +72,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     protected BiMap<String, Team> teams = HashBiMap.create();
     protected HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
 
-    protected final ImmutableBiMap<String, LifecycleStage> stages;
+    protected final ImmutableSet<LifecycleStage> stages;
     protected int currentStage = 0;
     protected long time;
 
@@ -80,13 +81,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         this.arena = arena;
         // admittedly not the most elegant solution, but it SHOULD work
-        this.stages = ImmutableBiMap.<String, LifecycleStage>builder().putAll(
-                Maps.uniqueIndex(stages, new Function<LifecycleStage, String>() {
-                    public String apply(LifecycleStage stage) {
-                        return stage.getId();
-                    }
-                })
-        ).build();
+        this.stages = stages;
     }
 
     @Override
@@ -168,7 +163,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public ImmutableSet<LifecycleStage> getLifecycleStages() {
-        return stages.values();
+        return stages;
     }
 
     @Override
@@ -178,14 +173,20 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void setLifecycleStage(LifecycleStage stage) {
-        if (stages.containsValue(stage)) {
-            Iterator<LifecycleStage> iterator = stages.values().iterator();
-            int i = 0;
-            while (iterator.hasNext()) {
-                if (iterator.next().equals(stage)) {
-                    currentStage = i;
+        if (stages.contains(stage)) {
+            if (!stage.equals(getLifecycleStage())) {
+                Iterator<LifecycleStage> iterator = stages.iterator();
+                int i = 0;
+                while (iterator.hasNext()) {
+                    if (iterator.next().equals(stage)) {
+                        break;
+                    }
+                    i++;
                 }
-                ++i;
+                CommonRoundChangeLifecycleStageEvent event
+                        = new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage);
+                getMinigame().getEventBus().post(event);
+                currentStage = i;
             }
         } else {
             throw new IllegalArgumentException("Invalid lifecycle stage");
@@ -194,7 +195,12 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public Optional<LifecycleStage> getLifecycleStage(String id) {
-        return Optional.fromNullable(stages.get(id));
+        for (LifecycleStage stage : stages) {
+            if (stage.getId().equals(id)) {
+                return Optional.of(stage);
+            }
+        }
+        return Optional.absent();
     }
 
     @Override
@@ -202,7 +208,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         if (index >= stages.size()) {
             throw new IndexOutOfBoundsException();
         }
-        return (LifecycleStage)stages.values().toArray()[index];
+        return stages.asList().get(index);
     }
 
     @Override

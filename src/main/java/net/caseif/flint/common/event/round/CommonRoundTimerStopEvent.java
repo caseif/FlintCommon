@@ -46,12 +46,12 @@ public class CommonRoundTimerStopEvent extends CommonRoundEvent implements Round
     }
 
     @Override
-    public boolean isCancelled() {
+    public final boolean isCancelled() {
         return cancelled;
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
+    public final void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 

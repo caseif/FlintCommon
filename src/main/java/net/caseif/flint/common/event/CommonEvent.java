@@ -38,19 +38,19 @@ import net.caseif.flint.event.FlintEvent;
  */
 public class CommonEvent implements FlintEvent {
 
-    private Minigame minigame;
+    private final Minigame minigame;
 
     protected CommonEvent(Minigame minigame) {
         this.minigame = minigame;
     }
 
     @Override
-    public Minigame getMinigame() {
+    public final Minigame getMinigame() {
         return minigame;
     }
 
     @Override
-    public String getPlugin() {
+    public final String getPlugin() {
         return minigame.getPlugin();
     }
 

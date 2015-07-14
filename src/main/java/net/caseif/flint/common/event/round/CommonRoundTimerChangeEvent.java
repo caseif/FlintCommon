@@ -41,8 +41,6 @@ public class CommonRoundTimerChangeEvent extends CommonRoundEvent implements Rou
     private long oldTime;
     private long newTime;
 
-    private boolean cancelled = false;
-
     public CommonRoundTimerChangeEvent(Round round, long oldTime, long newTime) {
         super(round);
         this.oldTime = oldTime;
@@ -50,12 +48,12 @@ public class CommonRoundTimerChangeEvent extends CommonRoundEvent implements Rou
     }
 
     @Override
-    public long getOldTime() {
+    public final long getOldTime() {
         return oldTime;
     }
 
     @Override
-    public long getNewTime() {
+    public final long getNewTime() {
         return newTime;
     }
 

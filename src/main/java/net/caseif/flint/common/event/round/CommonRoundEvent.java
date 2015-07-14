@@ -39,7 +39,7 @@ import net.caseif.flint.round.Round;
  */
 public class CommonRoundEvent extends CommonEvent implements RoundEvent {
 
-    private Round round;
+    private final Round round;
 
     protected CommonRoundEvent(Round round) {
         super(round.getMinigame());
@@ -47,7 +47,7 @@ public class CommonRoundEvent extends CommonEvent implements RoundEvent {
     }
 
     @Override
-    public Round getRound() {
+    public final Round getRound() {
         return this.round;
     }
 

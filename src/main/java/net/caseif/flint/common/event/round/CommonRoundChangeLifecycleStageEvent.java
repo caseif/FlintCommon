@@ -32,6 +32,8 @@ import net.caseif.flint.event.round.RoundChangeLifecycleStageEvent;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
+import com.google.common.base.Optional;
+
 /**
  * Implementation of {@link RoundChangeLifecycleStageEvent}.
  *
@@ -39,8 +41,8 @@ import net.caseif.flint.round.Round;
  */
 public class CommonRoundChangeLifecycleStageEvent extends CommonRoundEvent implements RoundChangeLifecycleStageEvent {
 
-    private LifecycleStage before;
-    private LifecycleStage after;
+    private final LifecycleStage before;
+    private final LifecycleStage after;
 
     public CommonRoundChangeLifecycleStageEvent(Round round, LifecycleStage before, LifecycleStage after) {
         super(round);
@@ -49,12 +51,12 @@ public class CommonRoundChangeLifecycleStageEvent extends CommonRoundEvent imple
     }
 
     @Override
-    public LifecycleStage getStageBefore() {
+    public final LifecycleStage getStageBefore() {
         return before;
     }
 
     @Override
-    public LifecycleStage getStageAfter() {
+    public final LifecycleStage getStageAfter() {
         return after;
     }
 

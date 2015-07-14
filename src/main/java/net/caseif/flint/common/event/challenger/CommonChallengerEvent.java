@@ -39,7 +39,7 @@ import net.caseif.flint.event.challenger.ChallengerEvent;
  */
 public class CommonChallengerEvent extends CommonEvent implements ChallengerEvent {
 
-    private Challenger challenger;
+    private final Challenger challenger;
 
     protected CommonChallengerEvent(Challenger challenger) {
         super(challenger.getMinigame());
@@ -47,7 +47,7 @@ public class CommonChallengerEvent extends CommonEvent implements ChallengerEven
     }
 
     @Override
-    public Challenger getChallenger() {
+    public final Challenger getChallenger() {
         return challenger;
     }
 

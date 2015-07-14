@@ -38,7 +38,7 @@ import net.caseif.flint.round.Round;
  */
 public class CommonRoundEndEvent extends CommonRoundEvent implements RoundEndEvent {
 
-    private boolean natural;
+    private final boolean natural;
 
     public CommonRoundEndEvent(Round round, boolean natural) {
         super(round);
@@ -46,7 +46,7 @@ public class CommonRoundEndEvent extends CommonRoundEvent implements RoundEndEve
     }
 
     @Override
-    public boolean isNatural() {
+    public final boolean isNatural() {
         return natural;
     }
 
