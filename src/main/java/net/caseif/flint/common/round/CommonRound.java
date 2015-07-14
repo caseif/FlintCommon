@@ -35,6 +35,7 @@ import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
+import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.util.CommonMetadatable;
 import net.caseif.flint.config.RoundConfigNode;
@@ -244,7 +245,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void resetTimer() {
-        stopTimer();
+        setTimerTicking(false);
         time = 0;
         setLifecycleStage((LifecycleStage)getLifecycleStages().toArray()[0]);
     }
@@ -261,10 +262,18 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void end(boolean rollback) {
+        end(rollback, false);
+    }
+
+    public void end(boolean rollback, boolean natural) {
+        CommonRoundEndEvent event = new CommonRoundEndEvent(this, natural);
+        getMinigame().getEventBus().post(event);
+        for (Challenger challenger : getChallengers()) {
+            challenger.removeFromRound();
+        }
         if (rollback) {
             rollback();
         }
-        throw new NotImplementedException("TODO"); //TODO
     }
 
     @Override

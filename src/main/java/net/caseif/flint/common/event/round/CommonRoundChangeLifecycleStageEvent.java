@@ -42,7 +42,7 @@ public class CommonRoundChangeLifecycleStageEvent extends CommonRoundEvent imple
     private LifecycleStage before;
     private LifecycleStage after;
 
-    protected CommonRoundChangeLifecycleStageEvent(Round round, LifecycleStage before, LifecycleStage after) {
+    public CommonRoundChangeLifecycleStageEvent(Round round, LifecycleStage before, LifecycleStage after) {
         super(round);
         this.before = before;
         this.after = after;

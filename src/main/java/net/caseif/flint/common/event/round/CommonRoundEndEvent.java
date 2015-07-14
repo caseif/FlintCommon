@@ -40,7 +40,7 @@ public class CommonRoundEndEvent extends CommonRoundEvent implements RoundEndEve
 
     private boolean natural;
 
-    protected CommonRoundEndEvent(Round round, boolean natural) {
+    public CommonRoundEndEvent(Round round, boolean natural) {
         super(round);
         this.natural = natural;
     }
