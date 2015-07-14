@@ -32,8 +32,6 @@ import net.caseif.flint.event.round.RoundChangeLifecycleStageEvent;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
-import com.google.common.base.Optional;
-
 /**
  * Implementation of {@link RoundChangeLifecycleStageEvent}.
  *

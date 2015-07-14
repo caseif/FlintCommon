@@ -44,13 +44,10 @@ import net.caseif.flint.locale.Localizable;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;

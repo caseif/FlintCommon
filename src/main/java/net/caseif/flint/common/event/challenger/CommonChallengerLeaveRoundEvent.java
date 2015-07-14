@@ -29,7 +29,6 @@
 package net.caseif.flint.common.event.challenger;
 
 import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.event.Cancellable;
 import net.caseif.flint.event.challenger.ChallengerLeaveRoundEvent;
 
 /**
