@@ -51,12 +51,16 @@ public class CommonMetadatable implements Metadatable {
 
     @Override
     public void setMetadata(String key, Object value) {
-        metadata.put(key, value);
+        if (value == null) {
+            removeMetadata(key);
+        } else {
+            metadata.put(key, value);
+        }
     }
 
     @Override
     public void removeMetadata(String key) {
-        metadata.put(key, null);
+        metadata.remove(key);
     }
 
     @Override

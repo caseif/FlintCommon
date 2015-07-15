@@ -46,7 +46,6 @@ import java.util.Map;
  *
  * @author Max Roncacé
  */
-//TODO: no persistance yet, need to work on that
 public abstract class CommonArena extends CommonMetadatable implements Arena {
 
     protected CommonMinigame parent;
@@ -56,7 +55,14 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
     protected HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
     protected Boundary boundary = null;
 
-    public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn) {
+    public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn)
+            throws IllegalArgumentException {
+        if (initialSpawn == null) {
+            throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must not be null");
+        }
+        if (!initialSpawn.getWorld().isPresent()) {
+            throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must have world");
+        }
         this.parent = parent;
         this.id = id;
         this.name = name;
@@ -87,6 +93,12 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
     @Override
     public void setBoundary(Boundary bound) {
         this.boundary = bound;
+        try {
+            store();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+        }
     }
 
     @Override
@@ -100,6 +112,12 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
                 spawns.put(id, spawn);
+                try {
+                    store();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+                }
                 return id;
             }
         }
@@ -116,6 +134,12 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
         for (Map.Entry<Integer, Location3D> e : spawns.entrySet()) {
             if (e.getValue().equals(location)) {
                 spawns.remove(e.getKey());
+                try {
+                    store();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+                }
                 return;
             }
         }
@@ -135,5 +159,34 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
     public String getPlugin() {
         return parent.getPlugin();
     }
+
+    @Override
+    public void setMetadata(String key, Object value) {
+        super.setMetadata(key, value);
+        try {
+            store();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+        }
+    }
+
+    @Override
+    public void removeMetadata(String key) {
+        super.removeMetadata(key);
+        try {
+            store();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+        }
+    }
+
+    /**
+     * Saves this {@link Arena} to persistent storage.
+     *
+     * @throws Exception If an {@link Exception} is thrown while saving to disk.
+     */
+    public abstract void store() throws Exception;
 
 }
