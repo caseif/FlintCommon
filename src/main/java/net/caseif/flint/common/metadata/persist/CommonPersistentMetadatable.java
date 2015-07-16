@@ -26,69 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.metadata;
+package net.caseif.flint.common.metadata.persist;
 
-import net.caseif.flint.metadata.Metadata;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.EventBus;
-
-import java.util.HashMap;
-import java.util.Map;
+import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.metadata.persist.PersistableMetadata;
+import net.caseif.flint.metadata.persist.PersistentMetadatable;
 
 /**
- * Implements {@link Metadata}.
+ * Implements {@link PersistentMetadatable}.
  *
  * @author Max Roncacé
  */
-public class CommonMetadata implements Metadata {
+public class CommonPersistentMetadatable extends CommonMetadatable implements PersistentMetadatable {
 
-    private final Map<String, Object> data = new HashMap<>();
+    private PersistableMetadata persistentMetadata = new CommonPersistableMetadata();
 
-    private static final EventBus EVENT_BUS = new EventBus();
-
-    protected CommonMetadata() {
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> get(String key) throws ClassCastException {
-        return Optional.fromNullable((T)data.get(key));
-    }
-
-    @Override
-    public <T> void set(String key, T value) {
-        data.put(key, value);
-    }
-
-    @Override
-    public Metadata createStructure(String key) throws IllegalArgumentException {
-        Preconditions.checkArgument(!data.containsKey(key), "Metadata key " + key + " is already set");
-        Metadata structure = new CommonMetadata();
-        data.put(key, structure);
-        return structure;
-    }
-
-    @Override
-    public boolean remove(String key) {
-        Object result = data.remove(key);
-        return result != null;
-    }
-
-    @Override
-    public ImmutableSet<String> getAllKeys() {
-        return ImmutableSet.copyOf(data.keySet());
-    }
-
-    @Override
-    public void clear() {
-        data.clear();
-    }
-
-    public static EventBus getEventBus() {
-        return EVENT_BUS;
+    public PersistableMetadata getPersistableMetadata() {
+        return persistentMetadata;
     }
 
 }

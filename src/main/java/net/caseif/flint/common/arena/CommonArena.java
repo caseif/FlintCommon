@@ -32,9 +32,9 @@ import net.caseif.flint.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.CommonMinigame;
-import net.caseif.flint.common.event.internal.metadata.MetadataMutateEvent;
+import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.metadata.CommonMetadata;
-import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.metadata.persist.CommonPersistentMetadatable;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
@@ -51,7 +51,7 @@ import java.util.Map;
  *
  * @author Max Roncacé
  */
-public abstract class CommonArena extends CommonMetadatable implements Arena {
+public abstract class CommonArena extends CommonPersistentMetadatable implements Arena {
 
     protected CommonMinigame parent;
     protected String id;
@@ -167,7 +167,7 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
     }
 
     @Subscribe
-    public void onMetadataMutate(MetadataMutateEvent event) {
+    public void onMetadataMutate(PersistableMetadataMutateEvent event) {
         if (event.getMetadata() == getMetadata()) { // check whether event pertains to this arena's metadata
             try {
                 store(); // re-store the arena
