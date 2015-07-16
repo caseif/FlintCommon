@@ -28,10 +28,12 @@
  */
 package net.caseif.flint.common.arena;
 
-import net.caseif.flint.arena.Arena;
 import net.caseif.flint.Minigame;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.CommonMinigame;
+import net.caseif.flint.common.event.internal.metadata.MetadataMutateEvent;
+import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
@@ -40,6 +42,7 @@ import net.caseif.flint.util.physical.Location3D;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.eventbus.Subscribe;
 
 import java.util.Map;
 
@@ -70,6 +73,7 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
         this.name = name;
         this.world = initialSpawn.getWorld().get();
         this.spawns.put(0, initialSpawn);
+        CommonMetadata.getEventBus().register(this);
     }
 
     @Override
@@ -162,34 +166,24 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
         return parent.getPlugin();
     }
 
-    //TODO: figure out how to handle storage on mutation
-    /*@Override
-    public void setMetadata(String key, Object value) {
-        super.setMetadata(key, value);
-        try {
-            store();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+    @Subscribe
+    public void onMetadataMutate(MetadataMutateEvent event) {
+        if (event.getMetadata() == getMetadata()) { // check whether event pertains to this arena's metadata
+            try {
+                store(); // re-store the arena
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+            }
         }
     }
-
-    @Override
-    public void removeMetadata(String key) {
-        super.removeMetadata(key);
-        try {
-            store();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
-        }
-    }*/
 
     /**
      * Saves this {@link Arena} to persistent storage.
      *
      * @throws Exception If an {@link Exception} is thrown while saving to disk.
      */
+    //TODO: possibly change this design to be more efficient
     public abstract void store() throws Exception;
 
 }
