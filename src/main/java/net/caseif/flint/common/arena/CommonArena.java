@@ -26,11 +26,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common;
+package net.caseif.flint.common.arena;
 
-import net.caseif.flint.Arena;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.Minigame;
-import net.caseif.flint.common.util.CommonMetadatable;
+import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.common.CommonMinigame;
+import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
@@ -147,7 +149,7 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
 
     @Override
     public Optional<Round> getRound() {
-        return Optional.fromNullable(parent.rounds.get(this));
+        return Optional.fromNullable(parent.getRoundMap().get(this));
     }
 
     @Override
@@ -160,7 +162,8 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
         return parent.getPlugin();
     }
 
-    @Override
+    //TODO: figure out how to handle storage on mutation
+    /*@Override
     public void setMetadata(String key, Object value) {
         super.setMetadata(key, value);
         try {
@@ -180,7 +183,7 @@ public abstract class CommonArena extends CommonMetadatable implements Arena {
             ex.printStackTrace();
             CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
         }
-    }
+    }*/
 
     /**
      * Saves this {@link Arena} to persistent storage.

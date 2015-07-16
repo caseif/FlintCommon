@@ -32,7 +32,7 @@ import net.caseif.flint.Minigame;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.round.CommonRound;
-import net.caseif.flint.common.util.CommonMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.round.Round;
 
 import com.google.common.base.Optional;

@@ -26,46 +26,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.util;
+package net.caseif.flint.common.metadata;
 
-import net.caseif.flint.util.Metadatable;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import net.caseif.flint.metadata.Metadata;
+import net.caseif.flint.metadata.Metadatable;
 
 /**
- * Barebones implementation of {@link Metadatable}.
+ * Implements {@link Metadatable}.
  */
 public class CommonMetadatable implements Metadatable {
 
-    protected Map<String, Object> metadata = new HashMap<>();
+    protected CommonMetadata metadata = new CommonMetadata();
 
     @Override
-    public Optional<Object> getMetadata(String key) {
-        return Optional.fromNullable(metadata.get(key));
-    }
-
-    @Override
-    public void setMetadata(String key, Object value) {
-        if (value == null) {
-            removeMetadata(key);
-        } else {
-            metadata.put(key, value);
-        }
-    }
-
-    @Override
-    public void removeMetadata(String key) {
-        metadata.remove(key);
-    }
-
-    @Override
-    public Set<String> getAllMetadata() {
-        return ImmutableSet.copyOf(metadata.keySet());
+    public Metadata getMetadata() {
+        return metadata;
     }
 
 }

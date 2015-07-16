@@ -28,17 +28,17 @@
  */
 package net.caseif.flint.common.round;
 
-import net.caseif.flint.Arena;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.Minigame;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
-import net.caseif.flint.common.CommonArena;
+import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
-import net.caseif.flint.common.util.CommonMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.locale.Localizable;
 import net.caseif.flint.round.LifecycleStage;
