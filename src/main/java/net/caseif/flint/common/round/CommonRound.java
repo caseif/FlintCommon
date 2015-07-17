@@ -28,8 +28,8 @@
  */
 package net.caseif.flint.common.round;
 
-import net.caseif.flint.arena.Arena;
 import net.caseif.flint.Minigame;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.arena.CommonArena;
@@ -39,6 +39,7 @@ import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.locale.Localizable;
 import net.caseif.flint.round.LifecycleStage;
@@ -265,7 +266,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void end(boolean rollback) {
-        end(rollback, false);
+        end(rollback, getConfigValue(ConfigNode.ROLLBACK_ON_END));
     }
 
     public void end(boolean rollback, boolean natural) {

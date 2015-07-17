@@ -34,13 +34,12 @@ import net.caseif.flint.metadata.persist.PersistableMetadata;
 import net.caseif.flint.metadata.persist.Serializer;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implements {@link PersistableMetadata}.
@@ -48,6 +47,49 @@ import java.util.Map;
  * @author Max Roncacé
  */
 public class CommonPersistableMetadata extends CommonMetadata implements PersistableMetadata {
+
+    /* Primitive values stored persistently are prefixed with a string to denote
+     * that they're actually primitives.
+     *
+     * The reasoning behind this is that otherwise, we'd have no real way of
+     * knowing that they're primitives and they'd just be loaded as strings with
+     * everything else (e.g. String i = "15").
+     *
+     * Furthermore, the internal character representation is also part of the
+     * respective assigned prefixes.
+     */
+    private static final String PRIMITIVE_PREFIX = "PRIM_";
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> get(String key) throws ClassCastException {
+        Optional<Object> value = super.get(key);
+        if (value.isPresent() && value.get() instanceof String) {
+            String str = (String)value.get();
+            if (str.startsWith(PRIMITIVE_PREFIX)) {
+                switch (str.charAt(PRIMITIVE_PREFIX.length())) {
+                    case 'Z':
+                        return Optional.of((T)Boolean.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'B':
+                        return Optional.of((T)Byte.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'S':
+                        return Optional.of((T)Short.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'C':
+                        return Optional.of((T)Character.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)
+                                .charAt(0)));
+                    case 'I':
+                        return Optional.of((T)Integer.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'J':
+                        return Optional.of((T)Long.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'F':
+                        return Optional.of((T)Float.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    case 'D':
+                        return Optional.of((T)Double.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                }
+            }
+        }
+        return (Optional<T>)value;
+    }
 
     @Override
     public <T> T get(String key, Serializer<T> serializer) throws ClassCastException, IllegalArgumentException {
@@ -65,6 +107,46 @@ public class CommonPersistableMetadata extends CommonMetadata implements Persist
     public void set(String key, String value) {
         data.put(key, value);
         postEvent();
+    }
+
+    @Override
+    public void set(String key, boolean value) {
+        set(key, PRIMITIVE_PREFIX + "Z_" + value);
+    }
+
+    @Override
+    public void set(String key, byte value) {
+        set(key, PRIMITIVE_PREFIX + "B_" + value);
+    }
+
+    @Override
+    public void set(String key, short value) {
+        set(key, PRIMITIVE_PREFIX + "S_" + value);
+    }
+
+    @Override
+    public void set(String key, char value) {
+        set(key, PRIMITIVE_PREFIX + "C_" + value);
+    }
+
+    @Override
+    public void set(String key, int value) {
+        set(key, PRIMITIVE_PREFIX + "I_" + value);
+    }
+
+    @Override
+    public void set(String key, long value) {
+        set(key, PRIMITIVE_PREFIX + "J_" + value);
+    }
+
+    @Override
+    public void set(String key, float value) {
+        set(key, PRIMITIVE_PREFIX + "F_" + value);
+    }
+
+    @Override
+    public void set(String key, double value) {
+        set(key, PRIMITIVE_PREFIX + "D_" + value);
     }
 
     @Override
