@@ -49,8 +49,6 @@ import java.util.Map;
  */
 public class CommonPersistableMetadata extends CommonMetadata implements PersistableMetadata {
 
-    private Map<String, Object> data = new HashMap<>();
-
     @Override
     public <T> T get(String key, Serializer<T> serializer) throws ClassCastException, IllegalArgumentException {
         Preconditions.checkArgument(data.get(key) instanceof String, "Metadata key " + key
