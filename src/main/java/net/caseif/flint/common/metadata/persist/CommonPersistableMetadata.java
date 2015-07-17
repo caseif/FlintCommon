@@ -48,7 +48,8 @@ import java.util.List;
  */
 public class CommonPersistableMetadata extends CommonMetadata implements PersistableMetadata {
 
-    /* Primitive values stored persistently are prefixed with a string to denote
+    /*
+     * Primitive values stored persistently are prefixed with a string to denote
      * that they're actually primitives.
      *
      * The reasoning behind this is that otherwise, we'd have no real way of
