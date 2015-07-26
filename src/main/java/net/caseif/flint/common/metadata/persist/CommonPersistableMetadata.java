@@ -86,6 +86,7 @@ public class CommonPersistableMetadata extends CommonMetadata implements Persist
                         return Optional.of((T)Float.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
                     case 'D':
                         return Optional.of((T)Double.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
+                    default: // continue to end
                 }
             }
         }

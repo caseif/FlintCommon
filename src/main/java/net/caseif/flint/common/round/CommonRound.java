@@ -41,7 +41,6 @@ import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
-import net.caseif.flint.locale.Localizable;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
@@ -151,11 +150,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void broadcast(String message) {
-        throw new NotImplementedException("TODO"); //TODO
-    }
-
-    @Override
-    public void broadcast(Localizable message) {
         throw new NotImplementedException("TODO"); //TODO
     }
 

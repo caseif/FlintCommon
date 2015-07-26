@@ -28,18 +28,16 @@
  */
 package net.caseif.flint.common;
 
-import net.caseif.flint.arena.Arena;
 import net.caseif.flint.Minigame;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.config.ConfigNode;
-import net.caseif.flint.locale.LocaleManager;
 import net.caseif.flint.round.Round;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.eventbus.EventBus;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,11 +106,6 @@ public abstract class CommonMinigame implements Minigame {
             }
         }
         return Optional.absent();
-    }
-
-    @Override
-    public LocaleManager getLocaleManager() {
-        throw new NotImplementedException("TODO"); //TODO
     }
 
     // everything below this line are internal utility methods
