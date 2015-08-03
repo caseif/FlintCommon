@@ -48,7 +48,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -150,7 +149,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void broadcast(String message) {
-        throw new NotImplementedException("TODO"); //TODO
+        throw new UnsupportedOperationException("Not yet implemented"); //TODO
     }
 
     @Override
@@ -250,7 +249,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     @Override
     public void rollback() {
-        throw new NotImplementedException("TODO"); //TODO
+        throw new UnsupportedOperationException("Not yet implemented"); //TODO
     }
 
     @Override
