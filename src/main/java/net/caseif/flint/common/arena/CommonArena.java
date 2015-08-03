@@ -60,7 +60,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     protected HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
     protected Boundary boundary = null;
 
-    public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn)
+    public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
             throws IllegalArgumentException {
         if (initialSpawn == null) {
             throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must not be null");
@@ -73,6 +73,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
         this.name = name;
         this.world = initialSpawn.getWorld().get();
         this.spawns.put(0, initialSpawn);
+        this.boundary = boundary;
         CommonMetadata.getEventBus().register(this);
     }
 
@@ -92,8 +93,8 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public Optional<Boundary> getBoundary() {
-        return Optional.fromNullable(boundary);
+    public Boundary getBoundary() {
+        return boundary;
     }
 
     @Override
