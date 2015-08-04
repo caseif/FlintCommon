@@ -51,21 +51,27 @@ public abstract class CommonCore extends FlintCore {
     }
 
     public static void logInfo(String message) {
-        ((CommonCore)INSTANCE).logInfo0(message);
+        ((CommonCore) INSTANCE).logInfo0(message);
     }
 
     protected abstract void logInfo0(String message);
 
     public static void logWarning(String message) {
-        ((CommonCore)INSTANCE).logWarning0(message);
+        ((CommonCore) INSTANCE).logWarning0(message);
     }
 
     protected abstract void logWarning0(String message);
 
     public static void logSevere(String message) {
-        ((CommonCore)INSTANCE).logSevere0(message);
+        ((CommonCore) INSTANCE).logSevere0(message);
     }
 
     protected abstract void logSevere0(String message);
+
+    public static void logVerbose(String message) {
+        ((CommonCore) INSTANCE).logVerbose0(message);
+    }
+
+    protected abstract void logVerbose0(String message);
 
 }

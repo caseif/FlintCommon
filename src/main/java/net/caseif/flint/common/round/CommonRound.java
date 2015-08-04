@@ -76,7 +76,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         this.arena = arena;
-        // admittedly not the most elegant solution, but it SHOULD work
         this.stages = stages;
     }
 
@@ -248,11 +247,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public void rollback() {
-        throw new UnsupportedOperationException("Not yet implemented"); //TODO
-    }
-
-    @Override
     public void end() {
         end(true);
     }
@@ -269,7 +263,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
             challenger.removeFromRound();
         }
         if (rollback) {
-            rollback();
+            getArena().rollback();
         }
     }
 
