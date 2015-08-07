@@ -30,17 +30,29 @@ package net.caseif.flint.common.event.challenger;
 
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.event.challenger.ChallengerLeaveRoundEvent;
+import net.caseif.flint.util.physical.Location3D;
 
 /**
  * Implements {@link ChallengerLeaveRoundEvent}.
  *
  * @author Max Roncacé
  */
-public class CommonChallengerLeaveRoundEvent extends CommonChallengerEvent
-        implements ChallengerLeaveRoundEvent {
+public class CommonChallengerLeaveRoundEvent extends CommonChallengerEvent implements ChallengerLeaveRoundEvent {
 
-    public CommonChallengerLeaveRoundEvent(Challenger challenger) {
+    private Location3D returnLocation;
+
+    public CommonChallengerLeaveRoundEvent(Challenger challenger, Location3D returnLocation) {
         super(challenger);
+        this.returnLocation = returnLocation;
     }
 
+    @Override
+    public Location3D getReturnLocation() {
+        return returnLocation;
+    }
+
+    @Override
+    public void setReturnLocation(Location3D location) {
+        this.returnLocation = location;
+    }
 }

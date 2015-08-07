@@ -28,7 +28,7 @@
  */
 package net.caseif.flint.common.arena;
 
-import net.caseif.flint.Minigame;
+import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.CommonMinigame;

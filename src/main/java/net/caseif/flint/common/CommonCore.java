@@ -29,7 +29,7 @@
 package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
-import net.caseif.flint.Minigame;
+import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.common.util.PlatformUtils;
 
 import java.util.HashMap;

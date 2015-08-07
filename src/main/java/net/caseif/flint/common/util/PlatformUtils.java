@@ -28,7 +28,7 @@
  */
 package net.caseif.flint.common.util;
 
-import net.caseif.flint.Minigame;
+import net.caseif.flint.minigame.Minigame;
 
 import java.io.File;
 
