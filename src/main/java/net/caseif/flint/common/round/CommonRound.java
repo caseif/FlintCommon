@@ -173,10 +173,9 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
                     }
                     i++;
                 }
-                CommonRoundChangeLifecycleStageEvent event
-                        = new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage);
-                getMinigame().getEventBus().post(event);
                 currentStage = i;
+                getMinigame().getEventBus()
+                        .post(new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage));
             }
         } else {
             throw new IllegalArgumentException("Invalid lifecycle stage");
@@ -238,8 +237,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public void setTime(long time, boolean callEvent) {
         this.time = time;
         if (callEvent) {
-            CommonRoundTimerChangeEvent event = new CommonRoundTimerChangeEvent(this, this.getTime(), time);
-            getMinigame().getEventBus().post(event);
+            getMinigame().getEventBus().post(new CommonRoundTimerChangeEvent(this, this.getTime(), time));
         }
     }
 
@@ -266,14 +264,13 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     public void end(boolean rollback, boolean natural) {
-        CommonRoundEndEvent event = new CommonRoundEndEvent(this, natural);
-        getMinigame().getEventBus().post(event);
         for (Challenger challenger : getChallengers()) {
             challenger.removeFromRound();
         }
         if (rollback) {
             getArena().rollback();
         }
+        getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
     }
 
     @Override
