@@ -29,7 +29,6 @@
 package net.caseif.flint.common.event.round.challenger;
 
 import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.event.Cancellable;
 import net.caseif.flint.event.round.challenger.ChallengerJoinRoundEvent;
 
 /**
@@ -37,23 +36,10 @@ import net.caseif.flint.event.round.challenger.ChallengerJoinRoundEvent;
  *
  * @author Max Roncacé
  */
-public class CommonChallengerJoinRoundEvent extends CommonChallengerEvent
-        implements ChallengerJoinRoundEvent, Cancellable {
-
-    private boolean cancelled = false;
+public class CommonChallengerJoinRoundEvent extends CommonChallengerEvent implements ChallengerJoinRoundEvent {
 
     public CommonChallengerJoinRoundEvent(Challenger challenger) {
         super(challenger);
-    }
-
-    @Override
-    public final boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public final void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
 }
