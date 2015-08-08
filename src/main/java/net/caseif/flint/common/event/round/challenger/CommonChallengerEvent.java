@@ -26,23 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.event.challenger;
+package net.caseif.flint.common.event.round.challenger;
 
 import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.common.event.CommonEvent;
-import net.caseif.flint.event.challenger.ChallengerEvent;
+import net.caseif.flint.common.event.round.CommonRoundEvent;
+import net.caseif.flint.event.round.challenger.ChallengerEvent;
 
 /**
  * Implements {@link ChallengerEvent}.
  *
  * @author Max Roncacé
  */
-public class CommonChallengerEvent extends CommonEvent implements ChallengerEvent {
+public class CommonChallengerEvent extends CommonRoundEvent implements ChallengerEvent {
 
     private final Challenger challenger;
 
     protected CommonChallengerEvent(Challenger challenger) {
-        super(challenger.getMinigame());
+        super(challenger.getRound());
         this.challenger = challenger;
     }
 

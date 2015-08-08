@@ -26,33 +26,34 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.event.challenger;
+package net.caseif.flint.common.event.round.challenger;
 
 import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.event.challenger.ChallengerLeaveRoundEvent;
-import net.caseif.flint.util.physical.Location3D;
+import net.caseif.flint.event.Cancellable;
+import net.caseif.flint.event.round.challenger.ChallengerJoinRoundEvent;
 
 /**
- * Implements {@link ChallengerLeaveRoundEvent}.
+ * Implements {@link ChallengerJoinRoundEvent}.
  *
  * @author Max Roncacé
  */
-public class CommonChallengerLeaveRoundEvent extends CommonChallengerEvent implements ChallengerLeaveRoundEvent {
+public class CommonChallengerJoinRoundEvent extends CommonChallengerEvent
+        implements ChallengerJoinRoundEvent, Cancellable {
 
-    private Location3D returnLocation;
+    private boolean cancelled = false;
 
-    public CommonChallengerLeaveRoundEvent(Challenger challenger, Location3D returnLocation) {
+    public CommonChallengerJoinRoundEvent(Challenger challenger) {
         super(challenger);
-        this.returnLocation = returnLocation;
     }
 
     @Override
-    public Location3D getReturnLocation() {
-        return returnLocation;
+    public final boolean isCancelled() {
+        return cancelled;
     }
 
     @Override
-    public void setReturnLocation(Location3D location) {
-        this.returnLocation = location;
+    public final void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
+
 }
