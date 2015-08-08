@@ -28,7 +28,6 @@
  */
 package net.caseif.flint.common.event.round;
 
-import net.caseif.flint.event.Cancellable;
 import net.caseif.flint.event.round.RoundTimerStopEvent;
 import net.caseif.flint.round.Round;
 
@@ -37,22 +36,12 @@ import net.caseif.flint.round.Round;
  *
  * @author Max Roncacé
  */
-public class CommonRoundTimerStopEvent extends CommonRoundEvent implements RoundTimerStopEvent, Cancellable {
+public class CommonRoundTimerStopEvent extends CommonRoundEvent implements RoundTimerStopEvent {
 
     private boolean cancelled = false;
 
     public CommonRoundTimerStopEvent(Round round) {
         super(round);
-    }
-
-    @Override
-    public final boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public final void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
 }

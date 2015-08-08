@@ -236,11 +236,11 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
      * @param callEvent Whether an event should be posted
      */
     public void setTime(long time, boolean callEvent) {
+        this.time = time;
         if (callEvent) {
             CommonRoundTimerChangeEvent event = new CommonRoundTimerChangeEvent(this, this.getTime(), time);
             getMinigame().getEventBus().post(event);
         }
-        this.time = time;
     }
 
     @Override
