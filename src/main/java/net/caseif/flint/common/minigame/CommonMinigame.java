@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common;
+package net.caseif.flint.common.minigame;
 
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
@@ -81,7 +81,7 @@ public abstract class CommonMinigame implements Minigame {
 
     @Override
     public Optional<Arena> getArena(String arenaName) {
-        return Optional.fromNullable(arenas.get(arenaName));
+        return Optional.fromNullable(arenas.get(arenaName.toLowerCase()));
     }
 
     @Override

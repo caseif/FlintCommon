@@ -31,7 +31,7 @@ package net.caseif.flint.common.arena;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
-import net.caseif.flint.common.CommonMinigame;
+import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadatable;
