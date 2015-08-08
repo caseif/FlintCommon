@@ -205,9 +205,18 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public Optional<LifecycleStage> getNextLifecycleStage() {
         return Optional.fromNullable(
                 currentStage < stages.size() - 1
-                        ? (LifecycleStage)getLifecycleStages().toArray()[currentStage]
+                        ? (LifecycleStage) getLifecycleStages().toArray()[currentStage]
                         : null
         );
+    }
+
+    @Override
+    public void nextLifecycleStage() throws IllegalStateException {
+        Optional<LifecycleStage> next = getNextLifecycleStage();
+        if (!next.isPresent()) {
+            throw new IllegalStateException("Current lifecycle stage is last defined");
+        }
+        setLifecycleStage(next.get());
     }
 
     @Override
