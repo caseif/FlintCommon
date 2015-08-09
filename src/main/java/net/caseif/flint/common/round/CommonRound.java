@@ -28,21 +28,22 @@
  */
 package net.caseif.flint.common.round;
 
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
-import net.caseif.flint.round.challenger.Challenger;
-import net.caseif.flint.round.challenger.Team;
 import net.caseif.flint.common.arena.CommonArena;
-import net.caseif.flint.common.round.challenger.CommonChallenger;
-import net.caseif.flint.common.round.challenger.CommonTeam;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.common.round.challenger.CommonChallenger;
+import net.caseif.flint.common.round.challenger.CommonTeam;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
+import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.round.challenger.Challenger;
+import net.caseif.flint.round.challenger.Team;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
@@ -265,7 +266,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         if (rollback) {
             getArena().rollback();
         }
-        getMinigame().getRounds().remove(this);
+        ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
         getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
     }
 
