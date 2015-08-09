@@ -30,7 +30,7 @@ package net.caseif.flint.common.minigame;
 
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
-import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.round.challenger.Challenger;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.round.Round;
 

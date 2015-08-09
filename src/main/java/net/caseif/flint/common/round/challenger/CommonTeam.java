@@ -26,11 +26,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.challenger;
+package net.caseif.flint.common.round.challenger;
 
 import net.caseif.flint.minigame.Minigame;
-import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.challenger.Team;
+import net.caseif.flint.round.challenger.Challenger;
+import net.caseif.flint.round.challenger.Team;
 import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.round.Round;
 
