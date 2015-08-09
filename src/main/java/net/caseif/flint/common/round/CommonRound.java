@@ -147,11 +147,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public void broadcast(String message) {
-        throw new UnsupportedOperationException("Not yet implemented"); //TODO
-    }
-
-    @Override
     public ImmutableSet<LifecycleStage> getLifecycleStages() {
         return stages;
     }
@@ -270,6 +265,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         if (rollback) {
             getArena().rollback();
         }
+        getMinigame().getRounds().remove(this);
         getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
     }
 
