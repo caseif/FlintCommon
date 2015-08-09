@@ -54,14 +54,14 @@ public abstract class CommonMinigame implements Minigame {
 
     private EventBus eventBus = new EventBus();
 
-    protected Map<ConfigNode<?>, Object> configValues = new HashMap<>();
+    protected Map<ConfigNode<?>, Object> config = new HashMap<>();
     protected BiMap<String, Arena> arenas = HashBiMap.create();
     protected BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
 
     @Override
     @SuppressWarnings("unchecked") // only mutable through setConfigValue(), which guarantees types match
     public <T> T getConfigValue(ConfigNode<T> node) {
-        return (T)configValues.getOrDefault(node, node.getDefaultValue());
+        return config.containsKey(node) ? (T) config.get(node) : node.getDefaultValue();
     }
 
     @Override
@@ -71,7 +71,7 @@ public abstract class CommonMinigame implements Minigame {
 
     @Override
     public <T> void setConfigValue(ConfigNode<T> node, T value) {
-        configValues.put(node, value);
+        config.put(node, value);
     }
 
     @Override
@@ -111,7 +111,7 @@ public abstract class CommonMinigame implements Minigame {
     // everything below this line are internal utility methods
 
     public Map<ConfigNode<?>, Object> getConfigMap() {
-        return configValues;
+        return config;
     }
 
     public Map<String, Arena> getArenaMap() {

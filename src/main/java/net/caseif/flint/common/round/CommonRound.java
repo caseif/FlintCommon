@@ -276,7 +276,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getConfigValue(RoundConfigNode<T> node) {
-        return (T)config.get(node);
+        return config.containsKey(node) ? (T) config.get(node) : node.getDefaultValue();
     }
 
     @Override
