@@ -260,13 +260,13 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     public void end(boolean rollback, boolean natural) {
+        ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
         for (Challenger challenger : getChallengers()) {
             challenger.removeFromRound();
         }
         if (rollback) {
             getArena().rollback();
         }
-        ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
         getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
     }
 
