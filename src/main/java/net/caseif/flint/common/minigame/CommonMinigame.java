@@ -28,6 +28,7 @@
  */
 package net.caseif.flint.common.minigame;
 
+import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.round.challenger.Challenger;
@@ -52,7 +53,7 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    private EventBus eventBus = new EventBus();
+    private EventBus eventBus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
 
     protected Map<ConfigNode<?>, Object> config = new HashMap<>();
     protected BiMap<String, Arena> arenas = HashBiMap.create();
