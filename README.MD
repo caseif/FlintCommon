@@ -9,7 +9,7 @@ FlintCommon requires Java 7 for compilation and use.
 
 ### Building
 
-FlintCommon uses Gradle as its build system. To clone and build the plugin from scratch:
+FlintCommon uses Gradle as its build system. To clone and build the project from scratch:
 
 - `git clone --recursive https://github.com/caseif/FlintCommon.git`
 - `cd FlintCommon`
