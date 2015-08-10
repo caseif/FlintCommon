@@ -212,6 +212,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
             throw new IllegalStateException("Current lifecycle stage is last defined");
         }
         setLifecycleStage(next.get());
+        setTime(0);
     }
 
     @Override
@@ -261,6 +262,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     public void end(boolean rollback, boolean natural) {
         ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
+
         for (Challenger challenger : getChallengers()) {
             challenger.removeFromRound();
         }
