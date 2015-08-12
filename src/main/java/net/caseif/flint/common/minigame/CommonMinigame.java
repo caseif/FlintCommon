@@ -28,12 +28,13 @@
  */
 package net.caseif.flint.common.minigame;
 
-import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
-import net.caseif.flint.round.challenger.Challenger;
+import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.config.ConfigNode;
+import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.round.challenger.Challenger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
@@ -53,11 +54,21 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    private EventBus eventBus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
+    private EventBus eventBus;
 
     protected Map<ConfigNode<?>, Object> config = new HashMap<>();
     protected BiMap<String, Arena> arenas = HashBiMap.create();
     protected BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
+
+    protected CommonMinigame() {
+        try {
+            eventBus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
+        } catch (NoClassDefFoundError ex) { // Guava version < 16.0
+            CommonCore.logWarning("Guava version is < 16.0 - SubscriberExceptionHandler is not supported. "
+                    + "Exceptions occurring in Flint event handlers may not be logged correctly.");
+            eventBus = new EventBus();
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked") // only mutable through setConfigValue(), which guarantees types match
