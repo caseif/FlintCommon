@@ -34,7 +34,7 @@ import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
-import net.caseif.flint.round.challenger.Challenger;
+import net.caseif.flint.challenger.Challenger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
