@@ -99,7 +99,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public void removeChallenger(UUID uuid) throws IllegalArgumentException {
         Challenger c = challengers.get(uuid);
         if (c == null) {
-            throw new IllegalArgumentException("Could not get challenger from UUID");
+            throw new IllegalArgumentException("Could not get challenger from UUID " + uuid);
         }
         removeChallenger(c);
     }
@@ -135,11 +135,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     @Override
     public Team getOrCreateTeam(String id) {
         Optional<Team> team = getTeam(id);
-        if (team.isPresent()) {
-            return team.get();
-        } else {
-            return createTeam(id);
-        }
+        return team.isPresent() ? team.get(): createTeam(id);
     }
 
     @Override
@@ -247,17 +243,17 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public void resetTimer() {
         setTimerTicking(false);
         time = 0;
-        setLifecycleStage((LifecycleStage)getLifecycleStages().toArray()[0]);
+        setLifecycleStage(getLifecycleStages().asList().get(0));
     }
 
     @Override
     public void end() {
-        end(true);
+        end(getConfigValue(ConfigNode.ROLLBACK_ON_END));
     }
 
     @Override
     public void end(boolean rollback) {
-        end(rollback, getConfigValue(ConfigNode.ROLLBACK_ON_END));
+        end(rollback, false);
     }
 
     public void end(boolean rollback, boolean natural) {

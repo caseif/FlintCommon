@@ -128,25 +128,25 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
                 return id;
             }
         }
-        return -1;
+        throw new AssertionError(); // logically impossible unless code is broken
     }
 
     @Override
     public void removeSpawnPoint(int index) {
         spawns.remove(index);
+        try {
+            store();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
+        }
     }
 
     @Override
     public void removeSpawnPoint(Location3D location) {
         for (Map.Entry<Integer, Location3D> e : spawns.entrySet()) {
             if (e.getValue().equals(location)) {
-                spawns.remove(e.getKey());
-                try {
-                    store();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
-                }
+                removeSpawnPoint(e.getKey());
                 return;
             }
         }

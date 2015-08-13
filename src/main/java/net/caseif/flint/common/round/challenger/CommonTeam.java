@@ -28,11 +28,13 @@
  */
 package net.caseif.flint.common.round.challenger;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.round.Round;
 import net.caseif.flint.round.challenger.Challenger;
 import net.caseif.flint.round.challenger.Team;
-import net.caseif.flint.common.metadata.CommonMetadatable;
-import net.caseif.flint.round.Round;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -67,13 +69,13 @@ public class CommonTeam extends CommonMetadatable implements Team {
     }
 
     @Override
-    public String getDisplayName() {
+    public String getName() {
         return name;
     }
 
     @Override
-    public void setDisplayName(String displayName) {
-        this.name = displayName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -82,13 +84,21 @@ public class CommonTeam extends CommonMetadatable implements Team {
     }
 
     @Override
-    public Set<Challenger> getChallengers() {
+    public ImmutableSet<Challenger> getChallengers() {
         return ImmutableSet.copyOf(challengers);
     }
 
     @Override
-    public void addChallenger(Challenger challenger) {
+    public void addChallenger(Challenger challenger) throws IllegalArgumentException {
+        checkArgument(challenger.getRound() == getRound(),
+                "Cannot add challenger to team: round mismatch");
         challengers.add(challenger);
+    }
+
+    @Override
+    public void removeChallenger(Challenger challenger) throws IllegalArgumentException {
+        checkArgument(challengers.contains(challenger), "Cannot remove challenger from team: not present");
+        challengers.remove(challenger);
     }
 
     @Override
