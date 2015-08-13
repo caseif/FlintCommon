@@ -29,8 +29,8 @@
 package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.common.util.PlatformUtils;
+import net.caseif.flint.minigame.Minigame;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,30 +44,63 @@ public abstract class CommonCore extends FlintCore {
 
     protected static Map<String, Minigame> minigames = new HashMap<>();
 
+    /**
+     * The singleton {@link PlatformUtils} instance.
+     */
     public static PlatformUtils PLATFORM_UTILS;
 
+    /**
+     * Returns the object mapping plugin names to their respective minigames (no
+     * rhyme intended).
+     *
+     * @return The object mapping plugin names to their respective minigames
+     */
     public static Map<String, Minigame> getMinigames() {
         return minigames;
     }
 
+    /**
+     * Used to log non-issue informational messages about the status of the
+     * software.
+     *
+     * @param message The log message
+     */
     public static void logInfo(String message) {
         ((CommonCore) INSTANCE).logInfo0(message);
     }
 
     protected abstract void logInfo0(String message);
 
+    /**
+     * Used to log warning events which may have a minor impact on the
+     * performance or functionality of the software.
+     *
+     * @param message The log message
+     */
     public static void logWarning(String message) {
         ((CommonCore) INSTANCE).logWarning0(message);
     }
 
     protected abstract void logWarning0(String message);
 
+    /**
+     * Used to log severe events which may be detrimental to the performance or
+     * functionality of the software.
+     *
+     * @param message The log message
+     */
     public static void logSevere(String message) {
         ((CommonCore) INSTANCE).logSevere0(message);
     }
 
     protected abstract void logSevere0(String message);
 
+    /**
+     * Used to log verbose events (only visible if verbose logging is explicitly
+     * enabled.
+     *
+     * @param message The log message
+     */
     public static void logVerbose(String message) {
         ((CommonCore) INSTANCE).logVerbose0(message);
     }

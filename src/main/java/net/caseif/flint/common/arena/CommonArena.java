@@ -128,7 +128,8 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
                 return id;
             }
         }
-        throw new AssertionError(); // logically impossible unless code is broken
+        // logically impossible in theory
+        throw new AssertionError("Logic error: could not get next available spawn. Report this immediately.");
     }
 
     @Override
