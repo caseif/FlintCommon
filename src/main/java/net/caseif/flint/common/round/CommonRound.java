@@ -147,7 +147,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public Team getOrCreateTeam(String id) throws OrphanedObjectException {
         checkState();
         Optional<Team> team = getTeam(id);
-        return team.isPresent() ? team.get(): createTeam(id);
+        return team.isPresent() ? team.get() : createTeam(id);
     }
 
     @Override
