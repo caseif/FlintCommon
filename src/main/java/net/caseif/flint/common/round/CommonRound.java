@@ -29,22 +29,22 @@
 package net.caseif.flint.common.round;
 
 import net.caseif.flint.arena.Arena;
+import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.arena.CommonArena;
+import net.caseif.flint.common.challenger.CommonChallenger;
+import net.caseif.flint.common.challenger.CommonTeam;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
 import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.common.minigame.CommonMinigame;
-import net.caseif.flint.common.challenger.CommonChallenger;
-import net.caseif.flint.common.challenger.CommonTeam;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.exception.OrphanedObjectException;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
-import net.caseif.flint.challenger.Challenger;
-import net.caseif.flint.challenger.Team;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
@@ -54,7 +54,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -123,7 +122,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Set<Team> getTeams() throws OrphanedObjectException {
+    public ImmutableSet<Team> getTeams() throws OrphanedObjectException {
         checkState();
         return ImmutableSet.copyOf(teams.values());
     }

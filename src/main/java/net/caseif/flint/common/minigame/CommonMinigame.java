@@ -29,16 +29,17 @@
 package net.caseif.flint.common.minigame;
 
 import net.caseif.flint.arena.Arena;
+import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
-import net.caseif.flint.challenger.Challenger;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 
 import java.util.HashMap;
@@ -87,8 +88,8 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public Set<Arena> getArenas() {
-        return arenas.values();
+    public ImmutableSet<Arena> getArenas() {
+        return ImmutableSet.copyOf(arenas.values());
     }
 
     @Override
@@ -97,17 +98,17 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public Set<Round> getRounds() {
-        return rounds.values();
+    public ImmutableSet<Round> getRounds() {
+        return ImmutableSet.copyOf(rounds.values());
     }
 
     @Override
-    public Set<Challenger> getChallengers() {
+    public ImmutableSet<Challenger> getChallengers() {
         Set<Challenger> challengers = new HashSet<>();
         for (Round r : getRounds()) { // >tfw no streams
             challengers.addAll(r.getChallengers());
         }
-        return challengers;
+        return ImmutableSet.copyOf(challengers);
     }
 
     @Override
