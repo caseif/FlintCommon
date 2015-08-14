@@ -28,6 +28,7 @@
  */
 package net.caseif.flint.common.arena;
 
+import net.caseif.flint.exception.OrphanedObjectException;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
@@ -62,6 +63,9 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
 
     public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
             throws IllegalArgumentException {
+        assert parent != null;
+        assert id != null;
+        assert name != null;
         if (initialSpawn == null) {
             throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must not be null");
         }
@@ -78,27 +82,32 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public String getId() {
+    public String getId() throws OrphanedObjectException {
+        checkState();
         return id;
     }
 
     @Override
-    public String getName() {
+    public String getName() throws OrphanedObjectException {
+        checkState();
         return name;
     }
 
     @Override
-    public String getWorld() {
+    public String getWorld() throws OrphanedObjectException {
+        checkState();
         return world;
     }
 
     @Override
-    public Boundary getBoundary() {
+    public Boundary getBoundary() throws OrphanedObjectException {
+        checkState();
         return boundary;
     }
 
     @Override
-    public void setBoundary(Boundary bound) {
+    public void setBoundary(Boundary bound) throws OrphanedObjectException {
+        checkState();
         this.boundary = bound;
         try {
             store();
@@ -109,12 +118,14 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public ImmutableBiMap<Integer, Location3D> getSpawnPoints() {
+    public ImmutableBiMap<Integer, Location3D> getSpawnPoints() throws OrphanedObjectException {
+        checkState();
         return ImmutableBiMap.copyOf(spawns);
     }
 
     @Override
-    public int addSpawnPoint(Location3D spawn) {
+    public int addSpawnPoint(Location3D spawn) throws OrphanedObjectException {
+        checkState();
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
@@ -133,7 +144,8 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public void removeSpawnPoint(int index) {
+    public void removeSpawnPoint(int index) throws OrphanedObjectException {
+        checkState();
         spawns.remove(index);
         try {
             store();
@@ -144,7 +156,8 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public void removeSpawnPoint(Location3D location) {
+    public void removeSpawnPoint(Location3D location) throws OrphanedObjectException {
+        checkState();
         for (Map.Entry<Integer, Location3D> e : spawns.entrySet()) {
             if (e.getValue().equals(location)) {
                 removeSpawnPoint(e.getKey());
@@ -154,17 +167,20 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public Optional<Round> getRound() {
+    public Optional<Round> getRound() throws OrphanedObjectException {
+        checkState();
         return Optional.fromNullable(parent.getRoundMap().get(this));
     }
 
     @Override
-    public Minigame getMinigame() {
+    public Minigame getMinigame() throws OrphanedObjectException {
+        checkState();
         return parent;
     }
 
     @Override
-    public String getPlugin() {
+    public String getPlugin() throws OrphanedObjectException {
+        checkState();
         return parent.getPlugin();
     }
 
@@ -178,6 +194,24 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
                 CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
             }
         }
+    }
+
+    /**
+     * Checks the state of this object.
+     *
+     * @throws OrphanedObjectException If this object is orphaned
+     */
+    protected void checkState() throws OrphanedObjectException {
+        if (parent == null) {
+            throw new OrphanedObjectException(this);
+        }
+    }
+
+    /**
+     * Orphans this object.
+     */
+    public void orphan() {
+        parent = null;
     }
 
     /**

@@ -30,11 +30,12 @@ package net.caseif.flint.common.challenger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import net.caseif.flint.common.metadata.CommonMetadatable;
-import net.caseif.flint.minigame.Minigame;
-import net.caseif.flint.round.Round;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
+import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.exception.OrphanedObjectException;
+import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.round.Round;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -55,6 +56,8 @@ public class CommonTeam extends CommonMetadatable implements Team {
     protected Set<Challenger> challengers = new HashSet<>();
 
     public CommonTeam(String id, Round round) throws IllegalArgumentException {
+        assert id != null;
+        assert round != null;
         if (round.getTeam(id).isPresent()) {
             throw new IllegalArgumentException("Team \"" + id + "\" already exists");
         }
@@ -64,51 +67,78 @@ public class CommonTeam extends CommonMetadatable implements Team {
     }
 
     @Override
-    public String getId() {
+    public String getId() throws OrphanedObjectException {
+        checkState();
         return id;
     }
 
     @Override
-    public String getName() {
+    public String getName() throws OrphanedObjectException {
+        checkState();
         return name;
     }
 
     @Override
-    public void setName(String name) {
+    public void setName(String name) throws OrphanedObjectException {
+        checkState();
         this.name = name;
     }
 
     @Override
-    public Round getRound() {
+    public Round getRound() throws OrphanedObjectException {
+        checkState();
         return round;
     }
 
     @Override
-    public ImmutableSet<Challenger> getChallengers() {
+    public ImmutableSet<Challenger> getChallengers() throws OrphanedObjectException {
+        checkState();
         return ImmutableSet.copyOf(challengers);
     }
 
     @Override
-    public void addChallenger(Challenger challenger) throws IllegalArgumentException {
+    public void addChallenger(Challenger challenger) throws IllegalArgumentException, OrphanedObjectException {
+        checkState();
         checkArgument(challenger.getRound() == getRound(),
                 "Cannot add challenger to team: round mismatch");
         challengers.add(challenger);
     }
 
     @Override
-    public void removeChallenger(Challenger challenger) throws IllegalArgumentException {
+    public void removeChallenger(Challenger challenger) throws IllegalArgumentException, OrphanedObjectException {
+        checkState();
         checkArgument(challengers.contains(challenger), "Cannot remove challenger from team: not present");
         challengers.remove(challenger);
     }
 
     @Override
-    public Minigame getMinigame() {
+    public Minigame getMinigame() throws OrphanedObjectException {
+        checkState();
         return getRound().getMinigame();
     }
 
     @Override
-    public String getPlugin() {
+    public String getPlugin() throws OrphanedObjectException {
+        checkState();
         return getRound().getPlugin();
+    }
+
+    /**
+     * Checks the state of this object.
+     *
+     * @throws OrphanedObjectException If this object is orphaned
+     */
+    protected void checkState() throws OrphanedObjectException {
+        if (round == null) {
+            throw new OrphanedObjectException(this);
+        }
+    }
+
+    /**
+     * Orphans this object.
+     */
+    public void orphan() {
+        round = null;
     }
 
 }

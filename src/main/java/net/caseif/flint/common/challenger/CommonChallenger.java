@@ -28,6 +28,7 @@
  */
 package net.caseif.flint.common.challenger;
 
+import net.caseif.flint.exception.OrphanedObjectException;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
@@ -53,67 +54,50 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
     protected Team team;
     protected boolean spectating = false;
 
-    /**
-     * Checks the state of this {@link CommonChallenger} object.
-     *
-     * @throws IllegalStateException If this object is no longer contained by a
-     *                               {@link Round}
-     */
-    protected void checkState() throws IllegalStateException {
-        if (round == null) {
-            throw new IllegalStateException("Challenger is no longer in a round");
-        }
-    }
-
     @Override
-    public String getName() throws IllegalStateException {
+    public String getName() throws OrphanedObjectException {
         checkState();
         return name;
     }
 
     @Override
-    public UUID getUniqueId() throws IllegalStateException {
+    public UUID getUniqueId() throws OrphanedObjectException {
         checkState();
         return uuid;
     }
 
     @Override
-    public Round getRound() throws IllegalStateException {
+    public Round getRound() throws OrphanedObjectException {
         checkState();
         return round;
     }
 
     @Override
-    public void removeFromRound() throws IllegalStateException {
+    public void removeFromRound() throws OrphanedObjectException {
         checkState();
         round.removeChallenger(this);
     }
 
-    public void invalidate() {
-        checkState();
-        round = null;
-    }
-
     @Override
-    public Optional<Team> getTeam() throws IllegalStateException {
+    public Optional<Team> getTeam() throws OrphanedObjectException {
         checkState();
         return Optional.fromNullable(team);
     }
 
     @Override
-    public void setTeam(Team team) throws IllegalStateException {
+    public void setTeam(Team team) throws OrphanedObjectException {
         checkState();
         this.team = team;
     }
 
     @Override
-    public boolean isSpectating() throws IllegalStateException {
+    public boolean isSpectating() throws OrphanedObjectException {
         checkState();
         return spectating;
     }
 
     @Override
-    public void setSpectating(boolean spectating) throws IllegalStateException {
+    public void setSpectating(boolean spectating) throws OrphanedObjectException {
         checkState();
         if (this.spectating != spectating) {
             this.spectating = spectating;
@@ -122,15 +106,30 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
     }
 
     @Override
-    public Minigame getMinigame() throws IllegalStateException {
+    public Minigame getMinigame() throws OrphanedObjectException {
         checkState();
         return round.getMinigame();
     }
 
     @Override
-    public String getPlugin() throws IllegalStateException {
+    public String getPlugin() throws OrphanedObjectException {
         checkState();
         return round.getPlugin();
+    }
+
+    /**
+     * Checks the state of this object.
+     *
+     * @throws OrphanedObjectException If this object is orphaned
+     */
+    protected void checkState() throws OrphanedObjectException {
+        if (round == null) {
+            throw new OrphanedObjectException();
+        }
+    }
+
+    public void orphan() {
+        round = null;
     }
 
 }
