@@ -47,12 +47,23 @@ import java.util.UUID;
  */
 public class CommonChallenger extends CommonMetadatable implements Challenger {
 
-    protected UUID uuid;
-    protected String name;
-    protected CommonRound round;
+    private final UUID uuid;
+    private final String name;
+    private final CommonRound round;
 
-    protected Team team;
-    protected boolean spectating = false;
+    private boolean orphan;
+
+    private Team team;
+    private boolean spectating = false;
+
+    protected CommonChallenger(UUID playerUuid, String playerName, CommonRound round) {
+        assert playerUuid != null;
+        assert playerName != null;
+        assert round != null;
+        this.uuid = playerUuid;
+        this.name = playerName;
+        this.round = round;
+    }
 
     @Override
     public String getName() throws OrphanedObjectException {
@@ -101,7 +112,7 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
         checkState();
         if (this.spectating != spectating) {
             this.spectating = spectating;
-            round.spectators += spectating ? 1 : -1;
+            round.augmentSpectators(spectating ? 1 : -1);
         }
     }
 
@@ -123,13 +134,13 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
      * @throws OrphanedObjectException If this object is orphaned
      */
     protected void checkState() throws OrphanedObjectException {
-        if (round == null) {
+        if (orphan) {
             throw new OrphanedObjectException();
         }
     }
 
     public void orphan() {
-        round = null;
+        orphan = true;
     }
 
 }

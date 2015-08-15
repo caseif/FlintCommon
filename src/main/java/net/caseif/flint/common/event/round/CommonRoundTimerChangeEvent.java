@@ -38,8 +38,8 @@ import net.caseif.flint.round.Round;
  */
 public class CommonRoundTimerChangeEvent extends CommonRoundEvent implements RoundTimerChangeEvent {
 
-    private long oldTime;
-    private long newTime;
+    private final long oldTime;
+    private final long newTime;
 
     public CommonRoundTimerChangeEvent(Round round, long oldTime, long newTime) {
         super(round);

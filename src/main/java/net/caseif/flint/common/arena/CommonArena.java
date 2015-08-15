@@ -58,13 +58,16 @@ import java.util.Map;
  */
 public abstract class CommonArena extends CommonPersistentMetadatable implements Arena {
 
-    protected CommonMinigame parent;
-    protected String id;
-    protected String name;
-    protected String world;
-    protected HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
-    protected HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
-    protected Boundary boundary = null;
+    private final CommonMinigame parent;
+    private final String id;
+    private final String name;
+    private final String world;
+    private final HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
+    private final HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
+
+    private Boundary boundary;
+
+    private boolean orphan = false;
 
     public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
             throws IllegalArgumentException {
@@ -215,6 +218,10 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
         return lobbies;
     }
 
+    public HashBiMap<Integer, Location3D> getSpawnPointMap() {
+        return spawns;
+    }
+
     /**
      * Unregisters the {@link LobbySign} at the given
      * {@link Location3D location}.
@@ -237,7 +244,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
      * @throws OrphanedObjectException If this object is orphaned
      */
     protected void checkState() throws OrphanedObjectException {
-        if (parent == null) {
+        if (orphan) {
             throw new OrphanedObjectException(this);
         }
     }
@@ -246,7 +253,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
      * Orphans this object.
      */
     public void orphan() {
-        parent = null;
+        orphan = true;
     }
 
     /**

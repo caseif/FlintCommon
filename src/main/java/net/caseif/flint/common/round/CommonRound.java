@@ -65,17 +65,19 @@ import java.util.UUID;
 @SuppressWarnings("ALL")
 public abstract class CommonRound extends CommonMetadatable implements Round {
 
-    protected CommonArena arena;
+    private final CommonArena arena;
 
-    protected BiMap<UUID, Challenger> challengers = HashBiMap.create();
-    protected BiMap<String, Team> teams = HashBiMap.create();
-    protected HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
+    private final BiMap<UUID, Challenger> challengers = HashBiMap.create();
+    private final BiMap<String, Team> teams = HashBiMap.create();
+    private final HashMap<RoundConfigNode<?>, Object> config = new HashMap<>();
+    private final ImmutableSet<LifecycleStage> stages;
 
-    protected final ImmutableSet<LifecycleStage> stages;
+    protected boolean orphan = false;
+
     protected int currentStage = 0;
-    protected long time;
+    private long time;
 
-    public int spectators;
+    private int spectators;
 
     public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         assert arena != null;
@@ -343,6 +345,10 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         return getArena().getPlugin();
     }
 
+    public void augmentSpectators(int amount) {
+        spectators += amount;
+    }
+
     public Map<UUID, Challenger> getChallengerMap() {
         checkState();
         return challengers;
@@ -359,7 +365,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
      * @throws OrphanedObjectException If this object is orphaned
      */
     protected void checkState() throws OrphanedObjectException {
-        if (arena == null) {
+        if (orphan) {
             throw new OrphanedObjectException(this);
         }
     }
@@ -368,7 +374,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
      * Orphans this object.
      */
     public void orphan() {
-        arena = null;
+        orphan = true;
     }
 
 }

@@ -40,13 +40,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -56,20 +53,22 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    private EventBus eventBus;
+    private final EventBus eventBus;
 
-    protected Map<ConfigNode<?>, Object> config = new HashMap<>();
-    protected BiMap<String, Arena> arenas = HashBiMap.create();
-    protected BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
+    private final Map<ConfigNode<?>, Object> config = new HashMap<>();
+    private final BiMap<String, Arena> arenas = HashBiMap.create();
+    private final BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
 
     protected CommonMinigame() {
+        EventBus bus;
         try {
-            eventBus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
+            bus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
         } catch (NoClassDefFoundError ex) { // Guava version < 16.0
             CommonCore.logWarning("Guava version is < 16.0 - SubscriberExceptionHandler is not supported. "
                     + "Exceptions occurring in Flint event handlers may not be logged correctly.");
-            eventBus = new EventBus();
+            bus = new EventBus();
         }
+        eventBus = bus;
     }
 
     @Override
@@ -105,11 +104,11 @@ public abstract class CommonMinigame implements Minigame {
 
     @Override
     public ImmutableList<Challenger> getChallengers() {
-        Set<Challenger> challengers = new HashSet<>();
+        ImmutableList.Builder<Challenger> builder = ImmutableList.builder();
         for (Round r : getRounds()) { // >tfw no streams
-            challengers.addAll(r.getChallengers());
+            builder.addAll(r.getChallengers());
         }
-        return ImmutableList.copyOf(challengers);
+        return builder.build();
     }
 
     @Override

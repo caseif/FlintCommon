@@ -36,7 +36,7 @@ import net.caseif.flint.metadata.Metadatable;
  */
 public class CommonMetadatable implements Metadatable {
 
-    protected CommonMetadata metadata = new CommonMetadata();
+    protected final CommonMetadata metadata = new CommonMetadata();
 
     @Override
     public Metadata getMetadata() {

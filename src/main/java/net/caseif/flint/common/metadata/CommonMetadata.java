@@ -45,9 +45,9 @@ import java.util.Map;
  */
 public class CommonMetadata implements Metadata {
 
-    protected Map<String, Object> data = new HashMap<>();
-
     private static final EventBus EVENT_BUS = new EventBus();
+
+    protected final Map<String, Object> data = new HashMap<>();
 
     protected CommonMetadata() {
     }

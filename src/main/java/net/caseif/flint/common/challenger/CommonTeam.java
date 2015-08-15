@@ -39,8 +39,8 @@ import net.caseif.flint.round.Round;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements {@link Team}.
@@ -49,11 +49,13 @@ import java.util.Set;
  */
 public class CommonTeam extends CommonMetadatable implements Team {
 
-    protected String id;
-    protected Round round;
+    private final String id;
+    private final Round round;
 
-    protected String name;
-    protected Set<Challenger> challengers = new HashSet<>();
+    private boolean orphan;
+
+    private String name;
+    private final List<Challenger> challengers = new ArrayList<>();
 
     public CommonTeam(String id, Round round) throws IllegalArgumentException {
         assert id != null;
@@ -129,7 +131,7 @@ public class CommonTeam extends CommonMetadatable implements Team {
      * @throws OrphanedObjectException If this object is orphaned
      */
     protected void checkState() throws OrphanedObjectException {
-        if (round == null) {
+        if (orphan) {
             throw new OrphanedObjectException(this);
         }
     }
@@ -138,7 +140,7 @@ public class CommonTeam extends CommonMetadatable implements Team {
      * Orphans this object.
      */
     public void orphan() {
-        round = null;
+        orphan = true;
     }
 
 }

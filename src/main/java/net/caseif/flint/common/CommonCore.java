@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public abstract class CommonCore extends FlintCore {
 
-    protected static Map<String, Minigame> minigames = new HashMap<>();
+    private static Map<String, Minigame> minigames = new HashMap<>();
 
     /**
      * The singleton {@link PlatformUtils} instance.

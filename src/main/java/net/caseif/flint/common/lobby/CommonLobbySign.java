@@ -43,8 +43,9 @@ import net.caseif.flint.util.physical.Location3D;
 public abstract class CommonLobbySign implements LobbySign {
 
     private final Location3D location;
-    private CommonArena arena; //TODO: make final and store boolean "orphaned" flag instead of nulling this
-    // same goes for other Orphanable classes
+    private final CommonArena arena;
+
+    private boolean orphan = false;
 
     protected CommonLobbySign(Location3D location, CommonArena arena) {
         this.location = location;
@@ -93,7 +94,7 @@ public abstract class CommonLobbySign implements LobbySign {
      * @throws OrphanedObjectException If this object is orphaned
      */
     protected void checkState() throws OrphanedObjectException {
-        if (arena == null) {
+        if (orphan) {
             throw new OrphanedObjectException(this);
         }
     }
@@ -102,7 +103,7 @@ public abstract class CommonLobbySign implements LobbySign {
      * Orphans this object.
      */
     public void orphan() {
-        arena = null;
+        orphan = true;
     }
 
 }

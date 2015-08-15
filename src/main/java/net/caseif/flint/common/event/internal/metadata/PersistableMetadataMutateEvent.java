@@ -35,7 +35,7 @@ import net.caseif.flint.metadata.persist.PersistableMetadata;
  */
 public class PersistableMetadataMutateEvent {
 
-    private PersistableMetadata subject;
+    private final PersistableMetadata subject;
 
     /**
      * Constructs a new {@link PersistableMetadataMutateEvent}.

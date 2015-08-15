@@ -38,8 +38,6 @@ import net.caseif.flint.round.Round;
  */
 public class CommonRoundTimerStartEvent extends CommonRoundEvent implements RoundTimerStartEvent {
 
-    private boolean cancelled = false;
-
     public CommonRoundTimerStartEvent(Round round) {
         super(round);
     }
