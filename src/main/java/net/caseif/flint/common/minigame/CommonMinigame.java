@@ -53,22 +53,27 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    private final EventBus eventBus;
+    //private static final Constructor<EventBus> eventBusConstructor;
+    //private static final Object exceptionHandlerInstance;
+
+    private EventBus eventBus;
 
     private final Map<ConfigNode<?>, Object> config = new HashMap<>();
     private final BiMap<String, Arena> arenas = HashBiMap.create();
     private final BiMap<Arena, Round> rounds = HashBiMap.create(); // guarantees values aren't duplicated
 
     protected CommonMinigame() {
-        EventBus bus;
+        // this is more complicated than it could be in order to prevent the JVM
+        // from attempting to load a class that may not exist at runtime
+        boolean exceptionHandlerSupport = false;
         try {
-            bus = new EventBus(FlintSubscriberExceptionHandler.getInstance());
-        } catch (NoClassDefFoundError ex) { // Guava version < 16.0
+            Class.forName("com.google.common.eventbus.SubscriberExceptionHandler");
+            exceptionHandlerSupport = true;
+        } catch (ClassNotFoundException ex) {
             CommonCore.logWarning("Guava version is < 16.0 - SubscriberExceptionHandler is not supported. "
                     + "Exceptions occurring in Flint event handlers may not be logged correctly.");
-            bus = new EventBus();
         }
-        eventBus = bus;
+        eventBus = exceptionHandlerSupport ? BreakingEventBusFactory.getBreakingEventBus() : new EventBus();
     }
 
     @Override
@@ -133,6 +138,29 @@ public abstract class CommonMinigame implements Minigame {
 
     public Map<Arena, Round> getRoundMap() {
         return rounds;
+    }
+
+    /**
+     * Factory for {@link EventBus}es which would otherwise break the plugin if
+     * unsupported.
+     *
+     * <p>Keeping the code in this class discrete from everything else ensures that
+     * the JVM doesn't attempt to load classes which are not available on the
+     * current platform.</p>
+     *
+     * @author Max Roncacé
+     */
+    private static class BreakingEventBusFactory {
+
+        /**
+         * Constructs and returns a new breaking {@link EventBus}.
+         *
+         * @return A new breaking {@link EventBus}
+         */
+        private static EventBus getBreakingEventBus() {
+            return new EventBus(FlintSubscriberExceptionHandler.getInstance());
+        }
+
     }
 
 }
