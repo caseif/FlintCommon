@@ -28,14 +28,16 @@
  */
 package net.caseif.flint.common.arena;
 
-import net.caseif.flint.exception.OrphanedObjectException;
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
-import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
+import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadatable;
+import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.exception.OrphanedObjectException;
+import net.caseif.flint.lobby.LobbySign;
+import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
@@ -43,8 +45,10 @@ import net.caseif.flint.util.physical.Location3D;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -59,6 +63,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     protected String name;
     protected String world;
     protected HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
+    protected HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
     protected Boundary boundary = null;
 
     public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
@@ -194,6 +199,36 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
                 CommonCore.logSevere("Failed to save arena with ID " + getId() + " to persistent storage");
             }
         }
+    }
+
+    @Override
+    public ImmutableSet<LobbySign> getLobbySigns() {
+        return ImmutableSet.copyOf(lobbies.values());
+    }
+
+    @Override
+    public Optional<LobbySign> getLobbySignAt(Location3D location) throws IllegalArgumentException {
+        return Optional.fromNullable(lobbies.get(location));
+    }
+
+    public HashMap<Location3D, LobbySign> getLobbySignMap() {
+        return lobbies;
+    }
+
+    /**
+     * Unregisters the {@link LobbySign} at the given
+     * {@link Location3D location}.
+     *
+     * <p><em>This method is intended for internal use only.</em></p>
+     *
+     * @param location The {@link Location3D location} of the {@link LobbySign}
+     *     to remove
+     */
+    public void unregisterLobbySign(Location3D location) {
+        CommonLobbySign sign = (CommonLobbySign) lobbies.get(location);
+        lobbies.remove(location);
+        sign.unstore();
+        sign.orphan();
     }
 
     /**

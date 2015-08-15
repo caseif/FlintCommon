@@ -31,7 +31,7 @@ package net.caseif.flint.common.metadata.persist;
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.metadata.persist.PersistableMetadata;
-import net.caseif.flint.metadata.persist.Serializer;
+import net.caseif.flint.serialization.Serializer;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
