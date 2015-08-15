@@ -49,6 +49,7 @@ import net.caseif.flint.round.Round;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.HashMap;
@@ -90,9 +91,9 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public ImmutableSet<Challenger> getChallengers() {
+    public ImmutableList<Challenger> getChallengers() {
         checkState();
-        return ImmutableSet.copyOf(challengers.values());
+        return ImmutableList.copyOf(challengers.values());
     }
 
     @Override
@@ -122,9 +123,9 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public ImmutableSet<Team> getTeams() throws OrphanedObjectException {
+    public ImmutableList<Team> getTeams() throws OrphanedObjectException {
         checkState();
-        return ImmutableSet.copyOf(teams.values());
+        return ImmutableList.copyOf(teams.values());
     }
 
     @Override

@@ -39,6 +39,7 @@ import net.caseif.flint.round.Round;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 
@@ -88,8 +89,8 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public ImmutableSet<Arena> getArenas() {
-        return ImmutableSet.copyOf(arenas.values());
+    public ImmutableList<Arena> getArenas() {
+        return ImmutableList.copyOf(arenas.values());
     }
 
     @Override
@@ -98,17 +99,17 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
-    public ImmutableSet<Round> getRounds() {
-        return ImmutableSet.copyOf(rounds.values());
+    public ImmutableList<Round> getRounds() {
+        return ImmutableList.copyOf(rounds.values());
     }
 
     @Override
-    public ImmutableSet<Challenger> getChallengers() {
+    public ImmutableList<Challenger> getChallengers() {
         Set<Challenger> challengers = new HashSet<>();
         for (Round r : getRounds()) { // >tfw no streams
             challengers.addAll(r.getChallengers());
         }
-        return ImmutableSet.copyOf(challengers);
+        return ImmutableList.copyOf(challengers);
     }
 
     @Override

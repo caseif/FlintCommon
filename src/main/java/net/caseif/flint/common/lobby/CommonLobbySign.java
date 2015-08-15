@@ -65,6 +65,7 @@ public abstract class CommonLobbySign implements LobbySign {
 
     @Override
     public void unregister() throws OrphanedObjectException {
+        checkState();
         arena.unregisterLobbySign(location);
     }
 

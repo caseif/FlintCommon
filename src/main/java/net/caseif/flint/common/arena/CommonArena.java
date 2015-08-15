@@ -45,7 +45,7 @@ import net.caseif.flint.util.physical.Location3D;
 import com.google.common.base.Optional;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 
 import java.util.HashMap;
@@ -202,8 +202,8 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public ImmutableSet<LobbySign> getLobbySigns() {
-        return ImmutableSet.copyOf(lobbies.values());
+    public ImmutableList<LobbySign> getLobbySigns() {
+        return ImmutableList.copyOf(lobbies.values());
     }
 
     @Override

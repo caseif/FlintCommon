@@ -37,7 +37,7 @@ import net.caseif.flint.exception.OrphanedObjectException;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -91,9 +91,9 @@ public class CommonTeam extends CommonMetadatable implements Team {
     }
 
     @Override
-    public ImmutableSet<Challenger> getChallengers() throws OrphanedObjectException {
+    public ImmutableList<Challenger> getChallengers() throws OrphanedObjectException {
         checkState();
-        return ImmutableSet.copyOf(challengers);
+        return ImmutableList.copyOf(challengers);
     }
 
     @Override
