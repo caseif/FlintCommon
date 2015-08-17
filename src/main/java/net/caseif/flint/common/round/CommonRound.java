@@ -114,14 +114,29 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         removeChallenger(c);
     }
 
-    @Override
-    public void removeChallenger(Challenger challenger) throws OrphanedObjectException {
+    /**
+     * Removes the given {@link Challenger} from this {@link CommonRound},
+     * taking note as to whether they are currently disconnecting from the
+     * server and whether lobby signs should be updated.
+     *
+     * @param challenger The {@link Challenger} to remove
+     * @param isDisconnecting Whether the {@link Challenger} is currently
+     *     disconnecting from the server
+     * @param updateSigns Whether to update the parent {@link Arena}'s
+     *     {@link LobbySign}s
+     */
+    public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns)
+            throws OrphanedObjectException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
         challengers.remove(challenger.getUniqueId(), challenger);
         ((CommonChallenger) challenger).orphan();
+    }
+
+    public void removeChallenger(Challenger challenger) throws OrphanedObjectException {
+        removeChallenger(challenger, false, true);
     }
 
     @Override
@@ -311,13 +326,12 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
-            challenger.removeFromRound();
+            ((CommonChallenger) challenger).removeFromRound(false);
         }
         if (rollback) {
             getArena().rollback();
         }
         getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
-        this.orphan();
     }
 
     @Override

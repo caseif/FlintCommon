@@ -85,8 +85,12 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
 
     @Override
     public void removeFromRound() throws OrphanedObjectException {
+        removeFromRound(true);
+    }
+
+    public void removeFromRound(boolean updateSigns) throws OrphanedObjectException {
         checkState();
-        round.removeChallenger(this);
+        round.removeChallenger(this, false, updateSigns);
     }
 
     @Override

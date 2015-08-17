@@ -235,7 +235,6 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
         CommonLobbySign sign = (CommonLobbySign) lobbies.get(location);
         lobbies.remove(location);
         sign.unstore();
-        sign.orphan();
     }
 
     /**
