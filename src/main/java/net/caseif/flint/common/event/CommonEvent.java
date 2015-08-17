@@ -45,13 +45,13 @@ public class CommonEvent implements FlintEvent {
     }
 
     @Override
-    public final Minigame getMinigame() {
+    public final Minigame getOwner() {
         return minigame;
     }
 
     @Override
-    public final String getPlugin() {
-        return minigame.getPlugin();
+    public final Minigame getMinigame() {
+        return getOwner();
     }
 
 }

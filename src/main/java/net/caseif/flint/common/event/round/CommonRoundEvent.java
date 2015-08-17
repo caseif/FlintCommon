@@ -42,7 +42,7 @@ public class CommonRoundEvent extends CommonEvent implements RoundEvent {
     private final Round round;
 
     protected CommonRoundEvent(Round round) {
-        super(round.getMinigame());
+        super(round.getArena().getMinigame());
         this.round = round;
     }
 

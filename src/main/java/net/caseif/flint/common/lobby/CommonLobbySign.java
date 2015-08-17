@@ -30,9 +30,8 @@ package net.caseif.flint.common.lobby;
 
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.arena.CommonArena;
-import net.caseif.flint.exception.OrphanedObjectException;
+import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.util.physical.Location3D;
 
 /**
@@ -53,29 +52,26 @@ public abstract class CommonLobbySign implements LobbySign {
     }
 
     @Override
-    public Location3D getLocation() throws OrphanedObjectException {
-        checkState();
-        return location;
-    }
-
-    @Override
-    public Arena getArena() throws OrphanedObjectException {
+    public Arena getOwner() throws OrphanedComponentException {
         checkState();
         return arena;
     }
 
     @Override
-    public void unregister() throws OrphanedObjectException {
+    public Arena getArena() throws OrphanedComponentException {
+        return getOwner();
+    }
+
+    @Override
+    public Location3D getLocation() throws OrphanedComponentException {
+        checkState();
+        return location;
+    }
+
+    @Override
+    public void unregister() throws OrphanedComponentException {
         checkState();
         arena.unregisterLobbySign(location);
-    }
-
-    public Minigame getMinigame() {
-        return arena.getMinigame();
-    }
-
-    public String getPlugin() {
-        return arena.getPlugin();
     }
 
     /**
@@ -91,11 +87,11 @@ public abstract class CommonLobbySign implements LobbySign {
     /**
      * Checks the state of this object.
      *
-     * @throws OrphanedObjectException If this object is orphaned
+     * @throws OrphanedComponentException If this object is orphaned
      */
-    protected void checkState() throws OrphanedObjectException {
+    protected void checkState() throws OrphanedComponentException {
         if (orphan) {
-            throw new OrphanedObjectException(this);
+            throw new OrphanedComponentException(this);
         }
     }
 

@@ -28,12 +28,11 @@
  */
 package net.caseif.flint.common.challenger;
 
-import net.caseif.flint.exception.OrphanedObjectException;
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
-import net.caseif.flint.common.round.CommonRound;
 import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.round.CommonRound;
+import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.Round;
 
 import com.google.common.base.Optional;
@@ -66,53 +65,57 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
     }
 
     @Override
-    public String getName() throws OrphanedObjectException {
-        checkState();
-        return name;
-    }
-
-    @Override
-    public UUID getUniqueId() throws OrphanedObjectException {
-        checkState();
-        return uuid;
-    }
-
-    @Override
-    public Round getRound() throws OrphanedObjectException {
+    public Round getOwner() throws OrphanedComponentException {
         checkState();
         return round;
     }
 
     @Override
-    public void removeFromRound() throws OrphanedObjectException {
+    public Round getRound() throws OrphanedComponentException {
+        return getOwner();
+    }
+
+    @Override
+    public String getName() throws OrphanedComponentException {
+        checkState();
+        return name;
+    }
+
+    @Override
+    public UUID getUniqueId() throws OrphanedComponentException {
+        checkState();
+        return uuid;
+    }
+    @Override
+    public void removeFromRound() throws OrphanedComponentException {
         removeFromRound(true);
     }
 
-    public void removeFromRound(boolean updateSigns) throws OrphanedObjectException {
+    public void removeFromRound(boolean updateSigns) throws OrphanedComponentException {
         checkState();
         round.removeChallenger(this, false, updateSigns);
     }
 
     @Override
-    public Optional<Team> getTeam() throws OrphanedObjectException {
+    public Optional<Team> getTeam() throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(team);
     }
 
     @Override
-    public void setTeam(Team team) throws OrphanedObjectException {
+    public void setTeam(Team team) throws OrphanedComponentException {
         checkState();
         this.team = team;
     }
 
     @Override
-    public boolean isSpectating() throws OrphanedObjectException {
+    public boolean isSpectating() throws OrphanedComponentException {
         checkState();
         return spectating;
     }
 
     @Override
-    public void setSpectating(boolean spectating) throws OrphanedObjectException {
+    public void setSpectating(boolean spectating) throws OrphanedComponentException {
         checkState();
         if (this.spectating != spectating) {
             this.spectating = spectating;
@@ -120,26 +123,14 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
         }
     }
 
-    @Override
-    public Minigame getMinigame() throws OrphanedObjectException {
-        checkState();
-        return round.getMinigame();
-    }
-
-    @Override
-    public String getPlugin() throws OrphanedObjectException {
-        checkState();
-        return round.getPlugin();
-    }
-
     /**
      * Checks the state of this object.
      *
-     * @throws OrphanedObjectException If this object is orphaned
+     * @throws OrphanedComponentException If this object is orphaned
      */
-    protected void checkState() throws OrphanedObjectException {
+    protected void checkState() throws OrphanedComponentException {
         if (orphan) {
-            throw new OrphanedObjectException();
+            throw new OrphanedComponentException();
         }
     }
 

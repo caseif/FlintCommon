@@ -35,7 +35,7 @@ import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadatable;
 import net.caseif.flint.common.minigame.CommonMinigame;
-import net.caseif.flint.exception.OrphanedObjectException;
+import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
@@ -90,31 +90,42 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public String getId() throws OrphanedObjectException {
+    public Minigame getOwner() throws OrphanedComponentException {
+        checkState();
+        return parent;
+    }
+
+    @Override
+    public Minigame getMinigame() throws OrphanedComponentException {
+        return getOwner();
+    }
+
+    @Override
+    public String getId() throws OrphanedComponentException {
         checkState();
         return id;
     }
 
     @Override
-    public String getName() throws OrphanedObjectException {
+    public String getName() throws OrphanedComponentException {
         checkState();
         return name;
     }
 
     @Override
-    public String getWorld() throws OrphanedObjectException {
+    public String getWorld() throws OrphanedComponentException {
         checkState();
         return world;
     }
 
     @Override
-    public Boundary getBoundary() throws OrphanedObjectException {
+    public Boundary getBoundary() throws OrphanedComponentException {
         checkState();
         return boundary;
     }
 
     @Override
-    public void setBoundary(Boundary bound) throws OrphanedObjectException {
+    public void setBoundary(Boundary bound) throws OrphanedComponentException {
         checkState();
         this.boundary = bound;
         try {
@@ -126,13 +137,13 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public ImmutableBiMap<Integer, Location3D> getSpawnPoints() throws OrphanedObjectException {
+    public ImmutableBiMap<Integer, Location3D> getSpawnPoints() throws OrphanedComponentException {
         checkState();
         return ImmutableBiMap.copyOf(spawns);
     }
 
     @Override
-    public int addSpawnPoint(Location3D spawn) throws OrphanedObjectException {
+    public int addSpawnPoint(Location3D spawn) throws OrphanedComponentException {
         checkState();
         int id;
         for (id = 0; id <= spawns.size(); id++) {
@@ -152,7 +163,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public void removeSpawnPoint(int index) throws OrphanedObjectException {
+    public void removeSpawnPoint(int index) throws OrphanedComponentException {
         checkState();
         spawns.remove(index);
         try {
@@ -164,7 +175,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public void removeSpawnPoint(Location3D location) throws OrphanedObjectException {
+    public void removeSpawnPoint(Location3D location) throws OrphanedComponentException {
         checkState();
         for (Map.Entry<Integer, Location3D> e : spawns.entrySet()) {
             if (e.getValue().equals(location)) {
@@ -175,21 +186,9 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public Optional<Round> getRound() throws OrphanedObjectException {
+    public Optional<Round> getRound() throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(parent.getRoundMap().get(this));
-    }
-
-    @Override
-    public Minigame getMinigame() throws OrphanedObjectException {
-        checkState();
-        return parent;
-    }
-
-    @Override
-    public String getPlugin() throws OrphanedObjectException {
-        checkState();
-        return parent.getPlugin();
     }
 
     @Subscribe
@@ -240,11 +239,11 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     /**
      * Checks the state of this object.
      *
-     * @throws OrphanedObjectException If this object is orphaned
+     * @throws OrphanedComponentException If this object is orphaned
      */
-    protected void checkState() throws OrphanedObjectException {
+    protected void checkState() throws OrphanedComponentException {
         if (orphan) {
-            throw new OrphanedObjectException(this);
+            throw new OrphanedComponentException(this);
         }
     }
 

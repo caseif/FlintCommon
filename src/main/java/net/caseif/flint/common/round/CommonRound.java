@@ -41,8 +41,7 @@ import net.caseif.flint.common.metadata.CommonMetadatable;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
-import net.caseif.flint.exception.OrphanedObjectException;
-import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
@@ -87,9 +86,14 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Arena getArena() {
+    public Arena getOwner() {
         checkState();
         return arena;
+    }
+
+    @Override
+    public Arena getArena() {
+        return getOwner();
     }
 
     @Override
@@ -99,13 +103,13 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Optional<Challenger> getChallenger(UUID uuid) throws OrphanedObjectException {
+    public Optional<Challenger> getChallenger(UUID uuid) throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(challengers.get(uuid));
     }
 
     @Override
-    public void removeChallenger(UUID uuid) throws IllegalArgumentException, OrphanedObjectException {
+    public void removeChallenger(UUID uuid) throws IllegalArgumentException, OrphanedComponentException {
         checkState();
         Challenger c = challengers.get(uuid);
         if (c == null) {
@@ -126,7 +130,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
      *     {@link LobbySign}s
      */
     public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns)
-            throws OrphanedObjectException {
+            throws OrphanedComponentException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
@@ -135,24 +139,24 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         ((CommonChallenger) challenger).orphan();
     }
 
-    public void removeChallenger(Challenger challenger) throws OrphanedObjectException {
+    public void removeChallenger(Challenger challenger) throws OrphanedComponentException {
         removeChallenger(challenger, false, true);
     }
 
     @Override
-    public ImmutableList<Team> getTeams() throws OrphanedObjectException {
+    public ImmutableList<Team> getTeams() throws OrphanedComponentException {
         checkState();
         return ImmutableList.copyOf(teams.values());
     }
 
     @Override
-    public Optional<Team> getTeam(String id) throws OrphanedObjectException {
+    public Optional<Team> getTeam(String id) throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(teams.get(id));
     }
 
     @Override
-    public Team createTeam(String id) throws IllegalArgumentException, OrphanedObjectException {
+    public Team createTeam(String id) throws IllegalArgumentException, OrphanedComponentException {
         checkState();
         if (teams.containsKey(id)) {
             throw new IllegalArgumentException("Team \"" + id + "\" already exists");
@@ -161,14 +165,14 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Team getOrCreateTeam(String id) throws OrphanedObjectException {
+    public Team getOrCreateTeam(String id) throws OrphanedComponentException {
         checkState();
         Optional<Team> team = getTeam(id);
         return team.isPresent() ? team.get() : createTeam(id);
     }
 
     @Override
-    public void removeTeam(String id) throws IllegalArgumentException, OrphanedObjectException {
+    public void removeTeam(String id) throws IllegalArgumentException, OrphanedComponentException {
         checkState();
         Team team = teams.get(id);
         if (team == null) {
@@ -178,7 +182,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public void removeTeam(Team team) throws IllegalArgumentException, OrphanedObjectException {
+    public void removeTeam(Team team) throws IllegalArgumentException, OrphanedComponentException {
         checkState();
         if (teams.get(team.getId()) != team) {
             throw new IllegalArgumentException("Team " + team.getId() + " is owned by a different round");
@@ -188,25 +192,25 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public int getSpectatorCount() throws OrphanedObjectException {
+    public int getSpectatorCount() throws OrphanedComponentException {
         checkState();
         return spectators;
     }
 
     @Override
-    public ImmutableSet<LifecycleStage> getLifecycleStages() throws OrphanedObjectException {
+    public ImmutableSet<LifecycleStage> getLifecycleStages() throws OrphanedComponentException {
         checkState();
         return stages;
     }
 
     @Override
-    public LifecycleStage getLifecycleStage() throws OrphanedObjectException {
+    public LifecycleStage getLifecycleStage() throws OrphanedComponentException {
         checkState();
         return (LifecycleStage)getLifecycleStages().toArray()[currentStage];
     }
 
     @Override
-    public void setLifecycleStage(LifecycleStage stage) throws OrphanedObjectException {
+    public void setLifecycleStage(LifecycleStage stage) throws OrphanedComponentException {
         checkState();
         if (stages.contains(stage)) {
             if (!stage.equals(getLifecycleStage())) {
@@ -219,7 +223,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
                     i++;
                 }
                 currentStage = i;
-                getMinigame().getEventBus()
+                getArena().getMinigame().getEventBus()
                         .post(new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage));
             }
         } else {
@@ -228,7 +232,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Optional<LifecycleStage> getLifecycleStage(String id) throws OrphanedObjectException {
+    public Optional<LifecycleStage> getLifecycleStage(String id) throws OrphanedComponentException {
         checkState();
         for (LifecycleStage stage : stages) {
             if (stage.getId().equals(id)) {
@@ -239,7 +243,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public LifecycleStage getLifecycleStage(int index) throws OrphanedObjectException {
+    public LifecycleStage getLifecycleStage(int index) throws OrphanedComponentException {
         checkState();
         if (index >= stages.size()) {
             throw new IndexOutOfBoundsException();
@@ -248,7 +252,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public Optional<LifecycleStage> getNextLifecycleStage() throws OrphanedObjectException {
+    public Optional<LifecycleStage> getNextLifecycleStage() throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(
                 currentStage < stages.size() - 1
@@ -258,7 +262,7 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public void nextLifecycleStage() throws IllegalStateException, OrphanedObjectException {
+    public void nextLifecycleStage() throws IllegalStateException, OrphanedComponentException {
         checkState();
         Optional<LifecycleStage> next = getNextLifecycleStage();
         if (!next.isPresent()) {
@@ -269,13 +273,13 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public long getTime() throws OrphanedObjectException {
+    public long getTime() throws OrphanedComponentException {
         checkState();
         return time;
     }
 
     @Override
-    public void setTime(long time) throws OrphanedObjectException {
+    public void setTime(long time) throws OrphanedComponentException {
         checkState();
         setTime(time, true);
     }
@@ -285,24 +289,24 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
      *
      * @param time The new time of the {@link Round}
      * @param callEvent Whether an event should be posted
-     * @throws OrphanedObjectException If this object is orphaned
+     * @throws OrphanedComponentException If this object is orphaned
      */
-    public void setTime(long time, boolean callEvent) throws OrphanedObjectException {
+    public void setTime(long time, boolean callEvent) throws OrphanedComponentException {
         checkState();
         this.time = time;
         if (callEvent) {
-            getMinigame().getEventBus().post(new CommonRoundTimerChangeEvent(this, this.getTime(), time));
+            getArena().getMinigame().getEventBus().post(new CommonRoundTimerChangeEvent(this, this.getTime(), time));
         }
     }
 
     @Override
-    public long getRemainingTime() throws OrphanedObjectException {
+    public long getRemainingTime() throws OrphanedComponentException {
         checkState();
         return getLifecycleStage().getDuration() == -1 ? -1 : getLifecycleStage().getDuration() - time;
     }
 
     @Override
-    public void resetTimer() throws OrphanedObjectException {
+    public void resetTimer() throws OrphanedComponentException {
         checkState();
         setTimerTicking(false);
         time = 0;
@@ -310,20 +314,20 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public void end() throws OrphanedObjectException {
+    public void end() throws OrphanedComponentException {
         checkState();
         end(getConfigValue(ConfigNode.ROLLBACK_ON_END));
     }
 
     @Override
-    public void end(boolean rollback) throws OrphanedObjectException {
+    public void end(boolean rollback) throws OrphanedComponentException {
         checkState();
         end(rollback, false);
     }
 
-    public void end(boolean rollback, boolean natural) throws OrphanedObjectException {
+    public void end(boolean rollback, boolean natural) throws OrphanedComponentException {
         checkState();
-        ((CommonMinigame) getMinigame()).getRoundMap().remove(getArena());
+        ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
             ((CommonChallenger) challenger).removeFromRound(false);
@@ -331,32 +335,20 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
         if (rollback) {
             getArena().rollback();
         }
-        getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
+        getArena().getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getConfigValue(RoundConfigNode<T> node) throws OrphanedObjectException {
+    public <T> T getConfigValue(RoundConfigNode<T> node) throws OrphanedComponentException {
         checkState();
         return config.containsKey(node) ? (T) config.get(node) : node.getDefaultValue();
     }
 
     @Override
-    public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedObjectException {
+    public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedComponentException {
         checkState();
         config.put(node, value);
-    }
-
-    @Override
-    public Minigame getMinigame() throws OrphanedObjectException {
-        checkState();
-        return getArena().getMinigame();
-    }
-
-    @Override
-    public String getPlugin() throws OrphanedObjectException {
-        checkState();
-        return getArena().getPlugin();
     }
 
     public void augmentSpectators(int amount) {
@@ -376,11 +368,11 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     /**
      * Checks the state of this object.
      *
-     * @throws OrphanedObjectException If this object is orphaned
+     * @throws OrphanedComponentException If this object is orphaned
      */
-    protected void checkState() throws OrphanedObjectException {
+    protected void checkState() throws OrphanedComponentException {
         if (orphan) {
-            throw new OrphanedObjectException(this);
+            throw new OrphanedComponentException(this);
         }
     }
 
