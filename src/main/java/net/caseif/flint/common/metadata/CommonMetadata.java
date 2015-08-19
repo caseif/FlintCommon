@@ -53,6 +53,11 @@ public class CommonMetadata implements Metadata {
     }
 
     @Override
+    public boolean has(String key) {
+        return get(key) != null;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> get(String key) throws ClassCastException {
         return Optional.fromNullable((T)data.get(key));
