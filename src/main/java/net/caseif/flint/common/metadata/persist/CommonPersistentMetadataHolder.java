@@ -28,20 +28,20 @@
  */
 package net.caseif.flint.common.metadata.persist;
 
-import net.caseif.flint.common.metadata.CommonMetadatable;
-import net.caseif.flint.metadata.persist.PersistableMetadata;
-import net.caseif.flint.metadata.persist.PersistentMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadataHolder;
+import net.caseif.flint.metadata.persist.PersistentMetadata;
+import net.caseif.flint.metadata.persist.PersistentMetadataHolder;
 
 /**
- * Implements {@link PersistentMetadatable}.
+ * Implements {@link PersistentMetadataHolder}.
  *
  * @author Max Roncacé
  */
-public class CommonPersistentMetadatable extends CommonMetadatable implements PersistentMetadatable {
+public class CommonPersistentMetadataHolder extends CommonMetadataHolder implements PersistentMetadataHolder {
 
-    private PersistableMetadata persistentMetadata = new CommonPersistableMetadata();
+    private PersistentMetadata persistentMetadata = new CommonPersistentMetadata();
 
-    public PersistableMetadata getPersistableMetadata() {
+    public PersistentMetadata getPersistableMetadata() {
         return persistentMetadata;
     }
 

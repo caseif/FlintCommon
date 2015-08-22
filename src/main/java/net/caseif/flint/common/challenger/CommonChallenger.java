@@ -30,7 +30,7 @@ package net.caseif.flint.common.challenger;
 
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
-import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.round.CommonRound;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.Round;
@@ -44,7 +44,7 @@ import java.util.UUID;
  *
  * @author Max Roncacé
  */
-public class CommonChallenger extends CommonMetadatable implements Challenger {
+public class CommonChallenger extends CommonMetadataHolder implements Challenger {
 
     private final UUID uuid;
     private final String name;
@@ -103,12 +103,6 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
     }
 
     @Override
-    public void setTeam(Team team) throws OrphanedComponentException {
-        checkState();
-        this.team = team;
-    }
-
-    @Override
     public boolean isSpectating() throws OrphanedComponentException {
         checkState();
         return spectating;
@@ -119,7 +113,6 @@ public class CommonChallenger extends CommonMetadatable implements Challenger {
         checkState();
         if (this.spectating != spectating) {
             this.spectating = spectating;
-            round.augmentSpectators(spectating ? 1 : -1);
         }
     }
 

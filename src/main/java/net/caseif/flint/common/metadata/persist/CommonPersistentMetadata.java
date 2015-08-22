@@ -30,7 +30,7 @@ package net.caseif.flint.common.metadata.persist;
 
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.metadata.CommonMetadata;
-import net.caseif.flint.metadata.persist.PersistableMetadata;
+import net.caseif.flint.metadata.persist.PersistentMetadata;
 import net.caseif.flint.serialization.Serializer;
 
 import com.google.common.base.Function;
@@ -42,11 +42,11 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 /**
- * Implements {@link PersistableMetadata}.
+ * Implements {@link PersistentMetadata}.
  *
  * @author Max Roncacé
  */
-public class CommonPersistableMetadata extends CommonMetadata implements PersistableMetadata {
+public class CommonPersistentMetadata extends CommonMetadata implements PersistentMetadata {
 
     /*
      * Primitive values stored persistently are prefixed with a string to denote
@@ -174,9 +174,9 @@ public class CommonPersistableMetadata extends CommonMetadata implements Persist
     }
 
     @Override
-    public PersistableMetadata createStructure(String key) {
+    public PersistentMetadata createStructure(String key) {
         Preconditions.checkArgument(!data.containsKey(key), "Metadata key " + key + " is already set");
-        PersistableMetadata structure = new CommonPersistableMetadata();
+        PersistentMetadata structure = new CommonPersistentMetadata();
         data.put(key, structure);
         postEvent();
         return structure;

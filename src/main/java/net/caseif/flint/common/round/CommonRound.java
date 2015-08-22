@@ -37,16 +37,18 @@ import net.caseif.flint.common.challenger.CommonTeam;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
-import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
-import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -62,7 +64,7 @@ import java.util.UUID;
  * @author Max Roncacé
  */
 @SuppressWarnings("ALL")
-public abstract class CommonRound extends CommonMetadatable implements Round {
+public abstract class CommonRound extends CommonMetadataHolder implements Round {
 
     private final CommonArena arena;
 
@@ -75,8 +77,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
 
     protected int currentStage = 0;
     private long time;
-
-    private int spectators;
 
     public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         assert arena != null;
@@ -192,9 +192,15 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     }
 
     @Override
-    public int getSpectatorCount() throws OrphanedComponentException {
+    public ImmutableList<Challenger> getSpectators() throws OrphanedComponentException {
         checkState();
-        return spectators;
+        // I really wish I could use streams right now
+        return ImmutableList.copyOf(Collections2.filter(getChallengers(), new Predicate<Challenger>() {
+            @Override
+            public boolean apply(Challenger challenger) {
+                return challenger.isSpectating();
+            }
+        }));
     }
 
     @Override
@@ -349,10 +355,6 @@ public abstract class CommonRound extends CommonMetadatable implements Round {
     public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedComponentException {
         checkState();
         config.put(node, value);
-    }
-
-    public void augmentSpectators(int amount) {
-        spectators += amount;
     }
 
     public Map<UUID, Challenger> getChallengerMap() {

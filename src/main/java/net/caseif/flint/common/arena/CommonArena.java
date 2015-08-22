@@ -33,7 +33,7 @@ import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
-import net.caseif.flint.common.metadata.persist.CommonPersistentMetadatable;
+import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
@@ -43,9 +43,8 @@ import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 
 import java.util.HashMap;
@@ -56,13 +55,13 @@ import java.util.Map;
  *
  * @author Max Roncacé
  */
-public abstract class CommonArena extends CommonPersistentMetadatable implements Arena {
+public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena {
 
     private final CommonMinigame parent;
     private final String id;
     private final String name;
     private final String world;
-    private final HashBiMap<Integer, Location3D> spawns = HashBiMap.create();
+    private final HashMap<Integer, Location3D> spawns = new HashMap<>();
     private final HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
 
     private Boundary boundary;
@@ -137,9 +136,9 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
     }
 
     @Override
-    public ImmutableBiMap<Integer, Location3D> getSpawnPoints() throws OrphanedComponentException {
+    public ImmutableMap<Integer, Location3D> getSpawnPoints() throws OrphanedComponentException {
         checkState();
-        return ImmutableBiMap.copyOf(spawns);
+        return ImmutableMap.copyOf(spawns);
     }
 
     @Override
@@ -217,7 +216,7 @@ public abstract class CommonArena extends CommonPersistentMetadatable implements
         return lobbies;
     }
 
-    public HashBiMap<Integer, Location3D> getSpawnPointMap() {
+    public HashMap<Integer, Location3D> getSpawnPointMap() {
         return spawns;
     }
 

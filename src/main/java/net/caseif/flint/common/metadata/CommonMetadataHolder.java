@@ -29,12 +29,12 @@
 package net.caseif.flint.common.metadata;
 
 import net.caseif.flint.metadata.Metadata;
-import net.caseif.flint.metadata.Metadatable;
+import net.caseif.flint.metadata.MetadataHolder;
 
 /**
- * Implements {@link Metadatable}.
+ * Implements {@link MetadataHolder}.
  */
-public class CommonMetadatable implements Metadatable {
+public class CommonMetadataHolder implements MetadataHolder {
 
     protected final CommonMetadata metadata = new CommonMetadata();
 

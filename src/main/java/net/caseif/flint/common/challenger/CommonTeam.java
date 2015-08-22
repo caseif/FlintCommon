@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
-import net.caseif.flint.common.metadata.CommonMetadatable;
+import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.Round;
 
@@ -46,7 +46,7 @@ import java.util.List;
  *
  * @author Max Roncacé
  */
-public class CommonTeam extends CommonMetadatable implements Team {
+public class CommonTeam extends CommonMetadataHolder implements Team {
 
     private final String id;
     private final Round round;

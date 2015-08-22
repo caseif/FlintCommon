@@ -28,32 +28,32 @@
  */
 package net.caseif.flint.common.event.internal.metadata;
 
-import net.caseif.flint.metadata.persist.PersistableMetadata;
+import net.caseif.flint.metadata.persist.PersistentMetadata;
 
 /**
  * Called when a {@link PersistableMetdata} object is mutated.
  */
 public class PersistableMetadataMutateEvent {
 
-    private final PersistableMetadata subject;
+    private final PersistentMetadata subject;
 
     /**
      * Constructs a new {@link PersistableMetadataMutateEvent}.
      *
-     * @param subject The {@link PersistableMetadata} object which is mutated in
+     * @param subject The {@link PersistentMetadata} object which is mutated in
      *     this event
      */
-    public PersistableMetadataMutateEvent(PersistableMetadata subject) {
+    public PersistableMetadataMutateEvent(PersistentMetadata subject) {
         this.subject = subject;
     }
 
     /**
-     * Returns the {@link PersistableMetadata} ojbect associated with this
+     * Returns the {@link PersistentMetadata} ojbect associated with this
      * event.
      *
-     * @return The {@link PersistableMetadata} object associated with this event
+     * @return The {@link PersistentMetadata} object associated with this event
      */
-    public PersistableMetadata getMetadata() {
+    public PersistentMetadata getMetadata() {
         return subject;
     }
 
