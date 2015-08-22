@@ -63,7 +63,7 @@ ext {
                     + (System.getenv('BUILD_NUMBER') ? '-jnks' + System.getenv('BUILD_NUMBER') : '')
     ) : ''
 
-    flintVersion = '1.0-SNAPSHOT'
+    flintVersion = '1.0'
 
     guava = 'com.google.guava:guava:17.0'
     flint = 'net.caseif.flint:flint:' + flintVersion
