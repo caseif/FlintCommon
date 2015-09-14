@@ -129,18 +129,20 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round 
      * @param updateSigns Whether to update the parent {@link Arena}'s
      *     {@link LobbySign}s
      */
-    public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns)
+    public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns, boolean orphan)
             throws OrphanedComponentException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
         challengers.remove(challenger.getUniqueId(), challenger);
-        ((CommonChallenger) challenger).orphan();
+        if (orphan) {
+            ((CommonChallenger) challenger).orphan();
+        }
     }
 
     public void removeChallenger(Challenger challenger) throws OrphanedComponentException {
-        removeChallenger(challenger, false, true);
+        removeChallenger(challenger, false, true, true);
     }
 
     @Override
@@ -336,12 +338,15 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round 
         ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
-            ((CommonChallenger) challenger).removeFromRound(false);
+            removeChallenger(challenger, false, false, false);
         }
         if (rollback) {
             getArena().rollback();
         }
         getArena().getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
+        for (Challenger challenger : getChallengers()) {
+            ((CommonChallenger) challenger).orphan();
+        }
     }
 
     @Override

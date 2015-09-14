@@ -147,7 +147,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
-                spawns.put(id, spawn);
+                spawns.put(id, new Location3D(world, spawn.getX(), spawn.getY(), spawn.getZ()));
                 try {
                     store();
                 } catch (Exception ex) {

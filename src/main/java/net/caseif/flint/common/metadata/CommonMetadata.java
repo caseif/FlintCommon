@@ -54,7 +54,7 @@ public class CommonMetadata implements Metadata {
 
     @Override
     public boolean has(String key) {
-        return get(key) != null;
+        return get(key).isPresent();
     }
 
     @Override

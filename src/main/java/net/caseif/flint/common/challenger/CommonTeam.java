@@ -28,18 +28,17 @@
  */
 package net.caseif.flint.common.challenger;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
+import com.google.common.collect.ImmutableList;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.Round;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Implements {@link Team}.
@@ -108,6 +107,10 @@ public class CommonTeam extends CommonMetadataHolder implements Team {
         checkArgument(challenger.getRound() == getRound(),
                 "Cannot add challenger to team: round mismatch");
         challengers.add(challenger);
+        if (challenger.getTeam().isPresent()) {
+            challenger.getTeam().get().removeChallenger(challenger);
+        }
+        ((CommonChallenger) challenger).setTeam(this);
     }
 
     @Override

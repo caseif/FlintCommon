@@ -86,20 +86,21 @@ public class CommonChallenger extends CommonMetadataHolder implements Challenger
         checkState();
         return uuid;
     }
+
     @Override
     public void removeFromRound() throws OrphanedComponentException {
-        removeFromRound(true);
-    }
-
-    public void removeFromRound(boolean updateSigns) throws OrphanedComponentException {
         checkState();
-        round.removeChallenger(this, false, updateSigns);
+        round.removeChallenger(this);
     }
 
     @Override
     public Optional<Team> getTeam() throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(team);
+    }
+
+    void setTeam(Team team) {
+        this.team = team;
     }
 
     @Override
