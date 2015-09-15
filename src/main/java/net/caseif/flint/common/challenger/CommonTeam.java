@@ -28,24 +28,27 @@
  */
 package net.caseif.flint.common.challenger;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
+import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.round.Round;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Implements {@link Team}.
  *
  * @author Max Roncacé
  */
-public class CommonTeam extends CommonMetadataHolder implements Team {
+public class CommonTeam extends CommonMetadataHolder implements Team, CommonComponent<Round> {
 
     private final String id;
     private final Round round;
@@ -120,22 +123,21 @@ public class CommonTeam extends CommonMetadataHolder implements Team {
         challengers.remove(challenger);
     }
 
-    /**
-     * Checks the state of this object.
-     *
-     * @throws OrphanedComponentException If this object is orphaned
-     */
-    protected void checkState() throws OrphanedComponentException {
+    @Override
+    public void checkState() throws OrphanedComponentException {
         if (orphan) {
             throw new OrphanedComponentException(this);
         }
     }
 
-    /**
-     * Orphans this object.
-     */
+    @Override
     public void orphan() {
-        orphan = true;
+        CommonCore.orphan(this);
+    }
+
+    @Override
+    public void setOrphanFlag() {
+        this.orphan = true;
     }
 
 }

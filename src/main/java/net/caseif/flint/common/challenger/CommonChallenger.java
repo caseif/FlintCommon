@@ -30,6 +30,8 @@ package net.caseif.flint.common.challenger;
 
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
+import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.round.CommonRound;
 import net.caseif.flint.component.exception.OrphanedComponentException;
@@ -44,7 +46,7 @@ import java.util.UUID;
  *
  * @author Max Roncacé
  */
-public class CommonChallenger extends CommonMetadataHolder implements Challenger {
+public abstract class CommonChallenger extends CommonMetadataHolder implements Challenger, CommonComponent<Round> {
 
     private final UUID uuid;
     private final String name;
@@ -117,19 +119,21 @@ public class CommonChallenger extends CommonMetadataHolder implements Challenger
         }
     }
 
-    /**
-     * Checks the state of this object.
-     *
-     * @throws OrphanedComponentException If this object is orphaned
-     */
-    protected void checkState() throws OrphanedComponentException {
+    @Override
+    public void checkState() throws OrphanedComponentException {
         if (orphan) {
             throw new OrphanedComponentException();
         }
     }
 
+    @Override
     public void orphan() {
-        orphan = true;
+        CommonCore.orphan(this);
+    }
+
+    @Override
+    public void setOrphanFlag() {
+        this.orphan = true;
     }
 
 }

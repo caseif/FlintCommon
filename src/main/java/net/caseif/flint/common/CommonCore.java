@@ -29,6 +29,7 @@
 package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.minigame.Minigame;
 
@@ -106,5 +107,11 @@ public abstract class CommonCore extends FlintCore {
     }
 
     protected abstract void logVerbose0(String message);
+
+    public static void orphan(CommonComponent<?> component) {
+        ((CommonCore) INSTANCE).orphan0(component);
+    }
+
+    protected abstract void orphan0(CommonComponent<?> component);
 
 }

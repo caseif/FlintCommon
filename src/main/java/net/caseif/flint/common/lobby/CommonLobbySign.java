@@ -29,7 +29,9 @@
 package net.caseif.flint.common.lobby;
 
 import net.caseif.flint.arena.Arena;
+import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.util.physical.Location3D;
@@ -39,7 +41,7 @@ import net.caseif.flint.util.physical.Location3D;
  *
  * @author Max Roncacé
  */
-public abstract class CommonLobbySign implements LobbySign {
+public abstract class CommonLobbySign implements LobbySign, CommonComponent<Arena> {
 
     private final Location3D location;
     private final CommonArena arena;
@@ -84,22 +86,21 @@ public abstract class CommonLobbySign implements LobbySign {
      */
     public abstract void unstore();
 
-    /**
-     * Checks the state of this object.
-     *
-     * @throws OrphanedComponentException If this object is orphaned
-     */
-    protected void checkState() throws OrphanedComponentException {
+    @Override
+    public void checkState() throws OrphanedComponentException {
         if (orphan) {
             throw new OrphanedComponentException(this);
         }
     }
 
-    /**
-     * Orphans this object.
-     */
+    @Override
     public void orphan() {
-        orphan = true;
+        CommonCore.orphan(this);
+    }
+
+    @Override
+    public void setOrphanFlag() {
+        this.orphan = true;
     }
 
 }

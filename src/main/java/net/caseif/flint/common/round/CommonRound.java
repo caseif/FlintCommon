@@ -31,9 +31,11 @@ package net.caseif.flint.common.round;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
+import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.challenger.CommonChallenger;
 import net.caseif.flint.common.challenger.CommonTeam;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
@@ -42,6 +44,7 @@ import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
+import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 
@@ -63,8 +66,8 @@ import java.util.UUID;
  *
  * @author Max Roncacé
  */
-@SuppressWarnings("ALL")
-public abstract class CommonRound extends CommonMetadataHolder implements Round {
+@SuppressWarnings("DuplicateThrows")
+public abstract class CommonRound extends CommonMetadataHolder implements Round, CommonComponent<Arena> {
 
     private final CommonArena arena;
 
@@ -372,22 +375,21 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round 
         return teams;
     }
 
-    /**
-     * Checks the state of this object.
-     *
-     * @throws OrphanedComponentException If this object is orphaned
-     */
-    protected void checkState() throws OrphanedComponentException {
+    @Override
+    public void checkState() throws OrphanedComponentException {
         if (orphan) {
             throw new OrphanedComponentException(this);
         }
     }
 
-    /**
-     * Orphans this object.
-     */
+    @Override
     public void orphan() {
-        orphan = true;
+        CommonCore.orphan(this);
+    }
+
+    @Override
+    public void setOrphanFlag() {
+        this.orphan = true;
     }
 
 }

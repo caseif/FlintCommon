@@ -30,6 +30,7 @@ package net.caseif.flint.common.arena;
 
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
@@ -55,7 +56,7 @@ import java.util.Map;
  *
  * @author Max Roncacé
  */
-public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena {
+public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena, CommonComponent<Minigame> {
 
     private final CommonMinigame parent;
     private final String id;
@@ -235,22 +236,21 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         sign.unstore();
     }
 
-    /**
-     * Checks the state of this object.
-     *
-     * @throws OrphanedComponentException If this object is orphaned
-     */
-    protected void checkState() throws OrphanedComponentException {
+    @Override
+    public void checkState() throws OrphanedComponentException {
         if (orphan) {
             throw new OrphanedComponentException(this);
         }
     }
 
-    /**
-     * Orphans this object.
-     */
+    @Override
     public void orphan() {
-        orphan = true;
+        CommonCore.orphan(this);
+    }
+
+    @Override
+    public void setOrphanFlag() {
+        this.orphan = true;
     }
 
     /**
