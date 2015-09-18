@@ -78,6 +78,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
 
     protected boolean orphan = false;
 
+    protected boolean ending;
     protected int currentStage = 0;
     private long time;
 
@@ -338,6 +339,10 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
 
     public void end(boolean rollback, boolean natural) throws OrphanedComponentException {
         checkState();
+        if (ending) {
+            throw new IllegalStateException("Cannot invoke end() on a round more than once");
+        }
+        ending = true;
         ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
