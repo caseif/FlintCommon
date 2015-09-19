@@ -28,6 +28,9 @@
  */
 package net.caseif.flint.common.arena;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.component.CommonComponent;
@@ -74,12 +77,10 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         assert parent != null;
         assert id != null;
         assert name != null;
-        if (initialSpawn == null) {
-            throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must not be null");
-        }
-        if (!initialSpawn.getWorld().isPresent()) {
-            throw new IllegalArgumentException("Initial spawn for arena \"" + id + "\" must have world");
-        }
+        checkNotNull(initialSpawn, "Initial spawn for arena \"" + id + "\" must not be null");
+        checkArgument(initialSpawn.getWorld().isPresent(),
+                "Initial spawn for arena \"" + id + "\" must have world");
+        checkArgument(boundary.contains(initialSpawn), "Spawn point must be within arena boundary");
         this.parent = parent;
         this.id = id;
         this.name = name;
@@ -145,6 +146,9 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public int addSpawnPoint(Location3D spawn) throws OrphanedComponentException {
         checkState();
+        if (!getBoundary().contains(spawn)) {
+            throw new IllegalArgumentException("Spawn point must be within arena boundary");
+        }
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
@@ -165,6 +169,9 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public void removeSpawnPoint(int index) throws OrphanedComponentException {
         checkState();
+        if (!spawns.containsKey(index)) {
+            throw new IllegalArgumentException("Cannot remove spawn: none exists with given index");
+        }
         spawns.remove(index);
         try {
             store();
@@ -183,6 +190,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
                 return;
             }
         }
+        throw new IllegalArgumentException("Cannot remove spawn: none exists at given location");
     }
 
     @Override

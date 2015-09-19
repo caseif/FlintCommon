@@ -53,9 +53,6 @@ import java.util.UUID;
  */
 public abstract class CommonMinigame implements Minigame {
 
-    //private static final Constructor<EventBus> eventBusConstructor;
-    //private static final Object exceptionHandlerInstance;
-
     private EventBus eventBus;
 
     private final Map<ConfigNode<?>, Object> config = new HashMap<>();
@@ -126,7 +123,7 @@ public abstract class CommonMinigame implements Minigame {
         return Optional.absent();
     }
 
-    // everything below this line are internal utility methods
+    // everything below this line is (are?) internal utility methods
 
     public Map<ConfigNode<?>, Object> getConfigMap() {
         return config;

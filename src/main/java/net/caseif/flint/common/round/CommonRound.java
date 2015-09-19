@@ -330,18 +330,18 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
-    public void end() throws OrphanedComponentException {
+    public void end() throws IllegalStateException, OrphanedComponentException {
         checkState();
         end(getConfigValue(ConfigNode.ROLLBACK_ON_END));
     }
 
     @Override
-    public void end(boolean rollback) throws OrphanedComponentException {
+    public void end(boolean rollback) throws IllegalStateException, OrphanedComponentException {
         checkState();
         end(rollback, false);
     }
 
-    public void end(boolean rollback, boolean natural) throws OrphanedComponentException {
+    public void end(boolean rollback, boolean natural) throws IllegalStateException, OrphanedComponentException {
         checkState();
         if (ending) {
             throw new IllegalStateException("Cannot invoke end() on a round more than once");
