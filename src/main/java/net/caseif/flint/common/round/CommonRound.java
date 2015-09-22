@@ -133,16 +133,18 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
      * @param updateSigns Whether to update the parent {@link Arena}'s
      *     {@link LobbySign}s
      */
-    public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns, boolean orphan)
-            throws OrphanedComponentException {
+    public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns,
+            boolean roundEnding) throws OrphanedComponentException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
-        challengers.remove(challenger.getUniqueId(), challenger);
-        if (updateSigns) {
-            for (LobbySign sign : getArena().getLobbySigns()) {
-                sign.update();
+        if (!roundEnding) {
+            challengers.remove(challenger.getUniqueId(), challenger);
+            if (updateSigns) {
+                for (LobbySign sign : getArena().getLobbySigns()) {
+                    sign.update();
+                }
             }
         }
 
@@ -150,7 +152,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     public void removeChallenger(Challenger challenger) throws OrphanedComponentException {
-        removeChallenger(challenger, false, true, true);
+        removeChallenger(challenger, false, true, false);
     }
 
     @Override
@@ -350,7 +352,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
-            removeChallenger(challenger, false, false, false);
+            removeChallenger(challenger, false, false, true);
         }
         if (rollback) {
             getArena().rollback();
@@ -365,7 +367,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     @SuppressWarnings("unchecked")
     public <T> T getConfigValue(RoundConfigNode<T> node) throws OrphanedComponentException {
         checkState();
-        return config.containsKey(node) ? (T) config.get(node) : node.getDefaultValue();
+        return config.containsKey(node) ? (T) config.get(node) : getArena().getMinigame().getConfigValue(node);
     }
 
     @Override
