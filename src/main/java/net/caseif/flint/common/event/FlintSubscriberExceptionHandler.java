@@ -69,7 +69,7 @@ public class FlintSubscriberExceptionHandler implements SubscriberExceptionHandl
 
     @Override
     public void handleException(Throwable exception, SubscriberExceptionContext context) {
-        CommonCore.logSevere("Failed to dispatch event " + context.getSubscriber() + " to "
+        CommonCore.logSevere("Failed to dispatch event " + context.getEvent().getClass() + " to "
                 + context.getSubscriberMethod());
         exception.printStackTrace();
     }
