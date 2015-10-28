@@ -173,7 +173,9 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         if (teams.containsKey(id)) {
             throw new IllegalArgumentException("Team \"" + id + "\" already exists");
         }
-        return new CommonTeam(id, this);
+        Team team = new CommonTeam(id, this);
+        teams.put(id, team);
+        return team;
     }
 
     @Override
