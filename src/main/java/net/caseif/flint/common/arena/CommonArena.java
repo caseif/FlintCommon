@@ -184,8 +184,15 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public void removeSpawnPoint(Location3D location) throws OrphanedComponentException {
         checkState();
+
+        if (location.getWorld().isPresent() && !location.getWorld().get().equals(world)) {
+            throw new IllegalArgumentException("Cannot remove spawn: world mismatch in provided location");
+        }
+
+        Location3D loc = new Location3D(world, location.getX(), location.getY(), location.getZ());
+
         for (Map.Entry<Integer, Location3D> e : spawns.entrySet()) {
-            if (e.getValue().equals(location)) {
+            if (e.getValue().equals(loc)) {
                 removeSpawnPoint(e.getKey());
                 return;
             }
