@@ -102,6 +102,10 @@ public abstract class CommonChallenger extends CommonMetadataHolder implements C
     }
 
     public void setTeam(Team team) {
+        team.addChallenger(this);
+    }
+
+    public void justSetTeam(Team team) {
         this.team = team;
     }
 

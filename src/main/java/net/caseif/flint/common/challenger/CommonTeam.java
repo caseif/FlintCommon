@@ -113,7 +113,7 @@ public class CommonTeam extends CommonMetadataHolder implements Team, CommonComp
         if (challenger.getTeam().isPresent()) {
             challenger.getTeam().get().removeChallenger(challenger);
         }
-        ((CommonChallenger) challenger).setTeam(this);
+        ((CommonChallenger) challenger).justSetTeam(this);
     }
 
     @Override
