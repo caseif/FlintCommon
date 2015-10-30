@@ -106,6 +106,11 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
+    public boolean isEnding() {
+        return ending;
+    }
+
+    @Override
     public ImmutableList<Challenger> getChallengers() {
         checkState();
         return ImmutableList.copyOf(challengers.values());
