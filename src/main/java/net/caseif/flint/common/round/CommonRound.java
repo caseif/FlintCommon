@@ -29,6 +29,7 @@
 package net.caseif.flint.common.round;
 
 import net.caseif.flint.arena.Arena;
+import net.caseif.flint.arena.SpawningMode;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonCore;
@@ -47,6 +48,7 @@ import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -60,6 +62,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implements {@link Round}.
@@ -68,6 +71,8 @@ import java.util.UUID;
  */
 @SuppressWarnings("DuplicateThrows")
 public abstract class CommonRound extends CommonMetadataHolder implements Round, CommonComponent<Arena> {
+
+    private AtomicInteger nextSpawn = new AtomicInteger();
 
     private final CommonArena arena;
 
@@ -134,7 +139,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
      *     {@link LobbySign}s
      */
     public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns,
-            boolean roundEnding) throws OrphanedComponentException {
+                                 boolean roundEnding) throws OrphanedComponentException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
@@ -153,6 +158,28 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
 
     public void removeChallenger(Challenger challenger) throws OrphanedComponentException {
         removeChallenger(challenger, false, true, false);
+    }
+
+    @Override
+    public Location3D nextSpawnPoint() {
+        int spawnIndex;
+        switch (getConfigValue(ConfigNode.SPAWNING_MODE)) {
+            case RANDOM: {
+                spawnIndex = (int) Math.floor(Math.random() * getArena().getSpawnPoints().size());
+                break;
+            }
+            case SEQUENTIAL: {
+                spawnIndex = nextSpawn.getAndIncrement();
+                if (nextSpawn.intValue() == getArena().getSpawnPoints().size()) {
+                    nextSpawn.set(0);
+                }
+                break;
+            }
+            default: {
+                throw new AssertionError();
+            }
+        }
+        return getArena().getSpawnPoints().values().asList().get(spawnIndex);
     }
 
     @Override
@@ -373,9 +400,15 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedComponentException {
         checkState();
         config.put(node, value);
+
+        // compatibility
+        if (node == ConfigNode.RANDOM_SPAWNING) {
+            config.put(ConfigNode.SPAWNING_MODE, (Boolean) value ? SpawningMode.RANDOM : SpawningMode.SEQUENTIAL);
+        }
     }
 
     public Map<UUID, Challenger> getChallengerMap() {
