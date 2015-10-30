@@ -146,9 +146,11 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public int addSpawnPoint(Location3D spawn) throws OrphanedComponentException {
         checkState();
-        if (!getBoundary().contains(spawn)) {
-            throw new IllegalArgumentException("Spawn point must be within arena boundary");
-        }
+
+        checkArgument(!getBoundary().contains(spawn), "Spawn point must be within arena boundary");
+        checkArgument(spawn.getWorld().isPresent() && !spawn.getWorld().get().equals(getWorld()),
+                "Spawn point must be within same world as arena");
+
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
