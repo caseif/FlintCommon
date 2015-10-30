@@ -1,6 +1,4 @@
-# FlintCommon
-
-[Continuous Integration](http://ci.caseif.net/job/FlintCommon/)
+# Flint [![](http://ci.caseif.net/job/FlintCommon/branch/master/badge/icon)](http://ci.caseif.net/job/FlintCommon/)
 
 Code shared across implementations of [Flint](https://github.com/caseif/Flint). This is not a functional program in
 itself.
