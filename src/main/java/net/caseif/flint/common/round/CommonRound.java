@@ -262,7 +262,8 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
-    public void setLifecycleStage(LifecycleStage stage) throws OrphanedComponentException {
+    public void setLifecycleStage(LifecycleStage stage, boolean resetTimer) throws IllegalArgumentException,
+            OrphanedComponentException {
         checkState();
         if (stages.contains(stage)) {
             if (!stage.equals(getLifecycleStage())) {
@@ -275,12 +276,18 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
                     i++;
                 }
                 currentStage = i;
+                time = 0;
                 getArena().getMinigame().getEventBus()
                         .post(new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage));
             }
         } else {
             throw new IllegalArgumentException("Invalid lifecycle stage");
         }
+    }
+
+    @Override
+    public void setLifecycleStage(LifecycleStage stage) throws IllegalArgumentException, OrphanedComponentException {
+        setLifecycleStage(stage, false);
     }
 
     @Override
