@@ -40,12 +40,15 @@ import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
+import net.caseif.flint.common.exception.round.CommonRoundJoinException;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
+import net.caseif.flint.exception.round.RoundJoinException;
 import net.caseif.flint.lobby.LobbySign;
+import net.caseif.flint.round.JoinResult;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Location3D;
@@ -120,6 +123,38 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     public Optional<Challenger> getChallenger(UUID uuid) throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(challengers.get(uuid));
+    }
+
+    @SuppressWarnings({"DuplicateThrows", "deprecation"})
+    @Override
+    public Challenger _INVALID_addChallenger(UUID uuid) throws IllegalStateException, RoundJoinException,
+            OrphanedComponentException {
+        JoinResult result = addChallenger(uuid);
+        RoundJoinException.Reason reason;
+        switch (result.getStatus()) {
+            case SUCCESS: {
+                return result.getChallenger();
+            }
+            case INTERNAL_ERROR: {
+                throw new CommonRoundJoinException(uuid, this, result.getThrowable());
+            }
+            case ALREADY_IN_ROUND: {
+                reason = RoundJoinException.Reason.ALREADY_ENTERED;
+                break;
+            }
+            case PLAYER_OFFLINE: {
+                reason = RoundJoinException.Reason.OFFLINE;
+                break;
+            }
+            case ROUND_FULL: {
+                reason = RoundJoinException.Reason.FULL;
+                break;
+            }
+            default: {
+                throw new AssertionError();
+            }
+        }
+        throw new CommonRoundJoinException(uuid, this, reason);
     }
 
     @Override
