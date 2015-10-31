@@ -39,7 +39,9 @@ import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
+import net.caseif.flint.exception.rollback.RollbackException;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
@@ -51,6 +53,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +64,8 @@ import java.util.Map;
  * @author Max Roncacé
  */
 public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena, CommonComponent<Minigame> {
+
+    protected CommonRollbackHelper rbHelper;
 
     private final CommonMinigame parent;
     private final String id;
@@ -226,6 +232,26 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public Optional<LobbySign> getLobbySignAt(Location3D location) throws IllegalArgumentException {
         return Optional.fromNullable(lobbies.get(location));
+    }
+
+    @Override
+    public void rollback() throws IllegalStateException, OrphanedComponentException {
+        checkState();
+        try {
+            getRollbackHelper().popRollbacks();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to rollback arena " + getName(), ex);
+        }
+    }
+
+    /**
+     * Gets the {@link RollbackHelper} associated with this {@link SteelArena}.
+     *
+     * @return The {@link RollbackHelper} associated with this
+     *     {@link SteelArena}
+     */
+    public CommonRollbackHelper getRollbackHelper() {
+        return rbHelper;
     }
 
     public HashMap<Location3D, LobbySign> getLobbySignMap() {
