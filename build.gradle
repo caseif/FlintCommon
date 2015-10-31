@@ -140,9 +140,8 @@ shadowJar {
         exclude dependency('org.bukkit:bukkit')
     }
     classifier = ''
-    doLast {
-        tasks.remap.execute()
-    }
+
+    finalizedBy tasks.remap
 }
 
 remap {
