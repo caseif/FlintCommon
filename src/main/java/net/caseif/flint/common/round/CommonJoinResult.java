@@ -47,10 +47,12 @@ public class CommonJoinResult implements JoinResult {
 
     public CommonJoinResult(Challenger challenger) {
         this.challenger = challenger;
+        this.status = Status.SUCCESS;
     }
 
     public CommonJoinResult(Throwable throwable) {
         this.throwable = throwable;
+        this.status = Status.INTERNAL_ERROR;
     }
 
     public CommonJoinResult(Status status) {

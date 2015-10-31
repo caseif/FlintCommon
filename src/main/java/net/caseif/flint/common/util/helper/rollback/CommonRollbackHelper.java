@@ -37,6 +37,7 @@ import net.caseif.flint.util.physical.Location3D;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -114,7 +115,7 @@ public abstract class CommonRollbackHelper {
         stateStore.createNewFile();
         try (Connection conn = DriverManager.getConnection(SQLITE_PROTOCOL + rollbackStore.getAbsolutePath())) {
             try (PreparedStatement st = conn.prepareStatement(SQL_QUERIES.getProperty("create-rollback-table")
-                            .replace("{table}", getArena().getId()))
+                    .replace("{table}", getArena().getId()))
             ) {
                 st.executeUpdate();
             }
@@ -257,13 +258,16 @@ public abstract class CommonRollbackHelper {
     @SuppressWarnings("deprecation")
     public void popRollbacks() throws SQLException {
         if (rollbackStore.exists()) {
-            JsonObject json;
+            JsonObject stateJson = null;
             JsonObject arenaSection = null;
             try {
-                json = new JsonParser().parse(new FileReader(stateStore)).getAsJsonObject();
-                arenaSection = json.getAsJsonObject(getArena().getId());
+                JsonElement je = new JsonParser().parse(new FileReader(stateStore));
+                if (!je.isJsonNull()) {
+                    stateJson = je.getAsJsonObject();
+                    arenaSection = stateJson.getAsJsonObject(getArena().getId());
+                }
             } catch (IOException ex) {
-                json = null;
+                stateJson = null;
                 CommonCore.logSevere("State store is corrupt - tile and entity data will not be restored");
                 ex.printStackTrace();
                 //noinspection ResultOfMethodCallIgnored
@@ -330,10 +334,10 @@ public abstract class CommonRollbackHelper {
                 }
                 drop.executeUpdate();
             }
-            if (json != null) {
-                json.remove(getArena().getId());
+            if (stateJson != null) {
+                stateJson.remove(getArena().getId());
                 try (FileWriter writer = new FileWriter(stateStore)) {
-                    writer.write(new Gson().toJson(json));
+                    writer.write(new Gson().toJson(stateJson));
                 } catch (IOException ex) {
                     CommonCore.logSevere("Failed to wipe rollback state store! This might hurt...");
                     ex.printStackTrace();
