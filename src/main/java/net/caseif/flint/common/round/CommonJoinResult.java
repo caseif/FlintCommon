@@ -26,29 +26,55 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.caseif.flint.common.exception.round;
+package net.caseif.flint.common.round;
 
-import net.caseif.flint.exception.round.RoundJoinException;
-import net.caseif.flint.round.Round;
+import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.round.JoinResult;
 
-import java.util.UUID;
+import com.google.common.base.Preconditions;
 
 /**
- * Implements {@link RoundJoinException}.
+ * Implements {@link JoinResult}.
+ *
+ * @author Max Roncacé
  */
-@SuppressWarnings("deprecation")
-public class CommonRoundJoinException extends RoundJoinException {
+public class CommonJoinResult implements JoinResult {
 
-    public CommonRoundJoinException(UUID player, Round round, Throwable cause, String message) {
-        super(player, round, cause, message);
+    private Status status;
+
+    private Challenger challenger;
+    private Throwable throwable;
+
+    public CommonJoinResult(Challenger challenger) {
+        this.challenger = challenger;
     }
 
-    public CommonRoundJoinException(UUID player, Round round, Throwable cause) {
-        super(player, round, cause);
+    public CommonJoinResult(Throwable throwable) {
+        this.throwable = throwable;
     }
 
-    public CommonRoundJoinException(UUID player, Round round, Reason reason) {
-        super(player, round, reason, reason.getMessage());
+    public CommonJoinResult(Status status) {
+        assert status != Status.SUCCESS;
+        assert status != Status.INTERNAL_ERROR;
+        this.status = status;
+    }
+
+    @Override
+    public Challenger getChallenger() throws IllegalStateException {
+        Preconditions.checkState(status == Status.SUCCESS, "Cannot get Challenger if JoinResult status is not SUCCESS");
+        return challenger;
+    }
+
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public Throwable getThrowable() throws IllegalStateException {
+        Preconditions.checkState(status == Status.INTERNAL_ERROR,
+                "Cannot get Throwable if JoinResult status is not INTERNAL_ERROR");
+        return throwable;
     }
 
 }

@@ -1,0 +1,1 @@
+net/caseif/flint/round/Round _INVALID_addChallenger(Ljava/util/UUID;)Lnet/caseif/flint/challenger/Challenger; addChallenger

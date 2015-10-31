@@ -16,11 +16,12 @@ plugins {
     id 'idea'
     id 'checkstyle'
     id 'com.github.johnrengelman.shadow' version '1.2.0'
+    id 'blue.lapis.methodremapper' version '0.1.3'
 }
 
 apply plugin: 'license'
 
-defaultTasks 'clean', 'licenseFormat', 'build', 'shadowJar'
+defaultTasks 'clean', 'licenseFormat', 'build', 'shadowJar', 'remap'
 
 // Project information
 group = 'net.caseif.flint.common'
@@ -82,10 +83,6 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-jar {
-    classifier = 'base'
-}
-
 jar.manifest.mainAttributes(
         'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
         'Specification-Title': 'Flint',
@@ -129,6 +126,10 @@ tasks.withType(Checkstyle){
     exclude '**/*.yml'
 }
 
+jar {
+    classifier = 'base'
+}
+
 shadowJar {
     configurations = [project.configurations.shadow]
     dependencies {
@@ -136,6 +137,11 @@ shadowJar {
         exclude dependency('org.bukkit:bukkit')
     }
     classifier = ''
+}
+
+remap {
+    inputTask = tasks.shadowJar
+    config = project.file('etc/remap.txt')
 }
 
 task sourceJar(type: Jar) {
