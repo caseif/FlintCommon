@@ -276,7 +276,9 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
                     i++;
                 }
                 currentStage = i;
-                time = 0;
+                if (resetTimer) {
+                    time = 0;
+                }
                 getArena().getMinigame().getEventBus()
                         .post(new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage));
             }
