@@ -52,10 +52,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-public abstract class CommonRollbackHelper {
+public abstract class CommonRollbackHelper implements ICommonRollbackHelper {
 
     public static final String SQLITE_PROTOCOL = "jdbc:sqlite:";
     public static final Properties SQL_QUERIES = new Properties();
@@ -73,6 +75,7 @@ public abstract class CommonRollbackHelper {
         this.arena = arena;
         this.rollbackStore = rollbackStore;
         this.stateStore = stateStore;
+        initializeStateStore();
     }
 
     static {
@@ -104,6 +107,7 @@ public abstract class CommonRollbackHelper {
      *     database
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
     public void createRollbackDatabase() throws IOException, SQLException {
         if (!rollbackStore.exists()) {
             rollbackStore.delete();
@@ -122,8 +126,40 @@ public abstract class CommonRollbackHelper {
         }
     }
 
-    protected void logChange(int recordType, Location3D location, UUID uuid, String type, int data,
-                             JsonObject state) throws IOException, SQLException {
+    @Override
+    public Map<Integer, String> loadStateMap() throws IOException {
+        Map<Integer, String> stateMap = new HashMap<>();
+
+        JsonObject json = new JsonParser().parse(new FileReader(stateStore)).getAsJsonObject();
+
+        if (!json.has(getArena().getId()) || !json.get(getArena().getId()).isJsonObject()) {
+            throw new IOException("Cannot load rollback states for arena " + getArena().getId());
+        }
+
+        JsonObject arena = json.getAsJsonObject(getArena().getId());
+
+        for (Map.Entry<String, JsonElement> entry : arena.entrySet()) {
+            int id = -1;
+            try {
+                id = Integer.parseInt(entry.getKey());
+            } catch (NumberFormatException ex) {
+                CommonCore.logWarning("Cannot load rollback state with ID " + entry.getKey() + " - key is not an int");
+            }
+
+            if (!entry.getValue().isJsonPrimitive() || !entry.getValue().getAsJsonPrimitive().isString()) {
+                CommonCore.logWarning("Cannot load rollback state with ID " + id + " - not a string");
+                continue;
+            }
+
+            stateMap.put(id, entry.getValue().getAsString());
+        }
+
+        return stateMap;
+    }
+
+    @Override
+    public void logChange(int recordType, Location3D location, UUID uuid, String type, int data, String stateSerial)
+            throws IOException, SQLException {
         String world = location.getWorld().isPresent() ? location.getWorld().get() : arena.getWorld();
         Preconditions.checkNotNull(location, "Location required for all record types");
         switch (recordType) {
@@ -136,7 +172,7 @@ public abstract class CommonRollbackHelper {
                 break;
             case RECORD_TYPE_ENTITY_CHANGED:
                 Preconditions.checkNotNull(type, "Type required for ENTITY_CHANGED record type");
-                Preconditions.checkNotNull(state, "State required for ENTITY_CHANGED record type");
+                Preconditions.checkNotNull(stateSerial, "State required for ENTITY_CHANGED record type");
                 break;
             default:
                 throw new IllegalArgumentException("Undefined record type");
@@ -208,7 +244,7 @@ public abstract class CommonRollbackHelper {
                 // replace non-negotiable values
                 updateSql = updateSql
                         .replace("{table}", getArena().getId())
-                        .replace("{state}", "" + (state != null ? 1 : 0))
+                        .replace("{state}", "" + (stateSerial != null ? 1 : 0))
                         .replace("{record_type}", "" + recordType);
             }
             int id;
@@ -222,57 +258,17 @@ public abstract class CommonRollbackHelper {
                     }
                 }
             }
-            if (state != null) {
-                JsonObject json = (JsonObject) new JsonParser().parse(new FileReader(stateStore));
-                JsonObject arenaSec;
-                if (json.get(getArena().getId()).isJsonObject()) {
-                    arenaSec = json.getAsJsonObject(getArena().getId());
-                } else {
-                    arenaSec = new JsonObject();
-                    json.add(getArena().getId(), arenaSec);
-                }
-                if (arenaSec.has(Integer.toString(id))) {
-                    throw new AssertionError("Tried to store state with id " + id + ", but "
-                            + "index was already present in rollback store! Something's gone terribly "
-                            + "wrong."); // technically should never happen but you never know
-                }
-                arenaSec.add(Integer.toString(id), state);
-                try (FileWriter writer = new FileWriter(stateStore)) {
-                    writer.write(new Gson().toJson(json));
-                }
+            if (stateSerial != null) {
+                saveStateSerial(id, stateSerial);
             }
         }
     }
 
-    protected static Optional<Arena> checkChangeAtLocation(Location3D location) {
-        for (Minigame mg : CommonCore.getMinigames().values()) {
-            for (Arena arena : mg.getArenas()) {
-                if (arena.getBoundary().contains(location)) {
-                    return Optional.of(arena);
-                }
-            }
-        }
-        return Optional.absent();
-    }
-
+    @Override
     @SuppressWarnings("deprecation")
-    public void popRollbacks() throws SQLException {
+    public void popRollbacks() throws IOException, SQLException {
         if (rollbackStore.exists()) {
-            JsonObject stateJson = null;
-            JsonObject arenaSection = null;
-            try {
-                JsonElement je = new JsonParser().parse(new FileReader(stateStore));
-                if (!je.isJsonNull()) {
-                    stateJson = je.getAsJsonObject();
-                    arenaSection = stateJson.getAsJsonObject(getArena().getId());
-                }
-            } catch (IOException ex) {
-                stateJson = null;
-                CommonCore.logSevere("State store is corrupt - tile and entity data will not be restored");
-                ex.printStackTrace();
-                //noinspection ResultOfMethodCallIgnored
-                stateStore.delete();
-            }
+            Map<Integer, String> stateMap = loadStateMap();
 
             try (
                     Connection conn = DriverManager.getConnection(SQLITE_PROTOCOL + rollbackStore.getAbsolutePath());
@@ -298,16 +294,10 @@ public abstract class CommonRollbackHelper {
                         int recordType = rs.getInt("record_type");
 
                         if (world.equals(getArena().getWorld())) {
-                            JsonObject stateSerial = null;
-                            if (state) {
-                                if (arenaSection != null) {
-                                    if (arenaSection.has("" + id)) {
-                                        stateSerial = arenaSection.getAsJsonObject("" + id);
-                                    } else {
-                                        CommonCore.logVerbose("Rollback record with ID " + id + " was marked as having "
-                                                + "state, but no corresponding serial was found");
-                                    }
-                                }
+                            String stateSerial = stateMap.get(id);
+                            if (state && stateSerial == null) {
+                                CommonCore.logVerbose("Rollback record with ID " + id + " was marked as having "
+                                        + "state, but no corresponding serial was found");
                             }
 
                             switch (recordType) {
@@ -334,27 +324,73 @@ public abstract class CommonRollbackHelper {
                 }
                 drop.executeUpdate();
             }
-            if (stateJson != null) {
-                stateJson.remove(getArena().getId());
-                try (FileWriter writer = new FileWriter(stateStore)) {
-                    writer.write(new Gson().toJson(stateJson));
-                } catch (IOException ex) {
-                    CommonCore.logSevere("Failed to wipe rollback state store! This might hurt...");
-                    ex.printStackTrace();
-                }
-            }
+            clearStateStore();
         } else {
             throw new IllegalArgumentException("Rollback store does not exist");
         }
     }
 
-    public abstract void rollbackBlock(int id, Location3D location, String type, int data, JsonObject stateSerial);
+    @Override
+    public void clearStateStore() throws IOException {
+        JsonObject json = new JsonParser().parse(new FileReader(stateStore)).getAsJsonObject();
 
-    public abstract void rollbackEntityCreation(int id, UUID uuid);
+        if (!json.has(getArena().getId()) || !json.get(getArena().getId()).isJsonObject()) {
+            CommonCore.logWarning("State store clear requested, but arena was not present");
+            return;
+        }
 
-    public abstract void rollbackEntityChange(int id, UUID uuid, Location3D location, String type,
-                                              JsonObject stateSerial);
+        json.remove(getArena().getId());
+        json.add(getArena().getId(), new JsonObject());
+        saveState(json);
+    }
 
-    public abstract void cacheEntities();
+    @Override
+    public void initializeStateStore() {
+        try {
+            if (!stateStore.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                stateStore.createNewFile();
+            }
+            JsonElement json = new JsonParser().parse(new FileReader(stateStore));
+            if (json.isJsonNull()) {
+                json = new JsonObject();
+            }
+            json.getAsJsonObject().add(getArena().getId(), new JsonObject());
+            saveState(json.getAsJsonObject());
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to intialize state store for arena " + arena.getId(), ex);
+        }
+    }
+
+    @Override
+    public void saveStateSerial(int id, String serial) throws IOException {
+        JsonObject json = new JsonParser().parse(new FileReader(stateStore)).getAsJsonObject();
+
+        if (!json.has(getArena().getId())) {
+            initializeStateStore();
+            saveStateSerial(id, serial); // i'm a bad person
+            return;
+        }
+
+        json.get(getArena().getId()).getAsJsonObject().addProperty(id + "", serial);
+        saveState(json);
+    }
+
+    private void saveState(JsonObject json) throws IOException {
+        try (FileWriter writer = new FileWriter(stateStore)) {
+            writer.write(new Gson().toJson(json));
+        }
+    }
+
+    protected static Optional<Arena> checkChangeAtLocation(Location3D location) {
+        for (Minigame mg : CommonCore.getMinigames().values()) {
+            for (Arena arena : mg.getArenas()) {
+                if (arena.getRound().isPresent() && arena.getBoundary().contains(location)) {
+                    return Optional.of(arena);
+                }
+            }
+        }
+        return Optional.absent();
+    }
 
 }

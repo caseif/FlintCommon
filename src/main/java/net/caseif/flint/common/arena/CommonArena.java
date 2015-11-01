@@ -41,7 +41,6 @@ import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
-import net.caseif.flint.exception.rollback.RollbackException;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
@@ -87,6 +86,17 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         checkArgument(initialSpawn.getWorld().isPresent(),
                 "Initial spawn for arena \"" + id + "\" must have world");
         checkArgument(boundary.contains(initialSpawn), "Spawn point must be within arena boundary");
+
+        if (!boundary.getLowerBound().getWorld().isPresent() && !boundary.getUpperBound().getWorld().isPresent()) {
+            Location3D newLower = new Location3D(
+                    initialSpawn.getWorld().get(),
+                    boundary.getLowerBound().getX(),
+                    boundary.getLowerBound().getY(),
+                    boundary.getLowerBound().getZ()
+            );
+            boundary = new Boundary(newLower, boundary.getUpperBound());
+        }
+
         this.parent = parent;
         this.id = id;
         this.name = name;
@@ -239,16 +249,16 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         checkState();
         try {
             getRollbackHelper().popRollbacks();
-        } catch (SQLException ex) {
+        } catch (IOException | SQLException ex) {
             throw new RuntimeException("Failed to rollback arena " + getName(), ex);
         }
     }
 
     /**
-     * Gets the {@link RollbackHelper} associated with this {@link SteelArena}.
+     * Gets the {@link CommonRollbackHelper} associated with this {@link CommonArena}.
      *
-     * @return The {@link RollbackHelper} associated with this
-     *     {@link SteelArena}
+     * @return The {@link CommonRollbackHelper} associated with this
+     *     {@link CommonArena}
      */
     public CommonRollbackHelper getRollbackHelper() {
         return rbHelper;
