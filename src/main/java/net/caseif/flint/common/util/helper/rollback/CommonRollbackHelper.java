@@ -34,7 +34,6 @@ import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.util.physical.Location3D;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -52,7 +51,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -382,15 +383,16 @@ public abstract class CommonRollbackHelper implements ICommonRollbackHelper {
         }
     }
 
-    protected static Optional<Arena> checkChangeAtLocation(Location3D location) {
+    protected static List<Arena> checkChangeAtLocation(Location3D location) {
+        List<Arena> arenas = new ArrayList<>();
         for (Minigame mg : CommonCore.getMinigames().values()) {
             for (Arena arena : mg.getArenas()) {
                 if (arena.getRound().isPresent() && arena.getBoundary().contains(location)) {
-                    return Optional.of(arena);
+                    arenas.add(arena);
                 }
             }
         }
-        return Optional.absent();
+        return arenas;
     }
 
 }
