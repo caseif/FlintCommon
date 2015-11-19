@@ -29,12 +29,16 @@
 package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
+import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.minigame.Minigame;
 
+import com.google.common.base.Optional;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Implements {@link FlintCore}.
@@ -58,6 +62,22 @@ public abstract class CommonCore extends FlintCore {
      */
     public static Map<String, Minigame> getMinigames() {
         return minigames;
+    }
+
+    /**
+     * Gets the {@link Challenger} with the given {@link UUID} from any existing
+     * {@link Minigame}.
+     *
+     * @param uuid The {@link UUID} of the {@link Challenger} to get
+     * @return The {@link Challenger} with the given {@link UUID}
+     */
+    public static Optional<Challenger> getChallenger(UUID uuid) {
+        for (Minigame mg : getMinigames().values()) {
+            if (mg.getChallenger(uuid).isPresent()) {
+                return mg.getChallenger(uuid);
+            }
+        }
+        return Optional.absent();
     }
 
     /**

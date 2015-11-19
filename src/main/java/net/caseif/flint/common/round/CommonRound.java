@@ -29,6 +29,7 @@
 package net.caseif.flint.common.round;
 
 import net.caseif.flint.arena.Arena;
+import net.caseif.flint.arena.SpawningMode;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonCore;
@@ -39,14 +40,18 @@ import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
+import net.caseif.flint.common.exception.round.CommonRoundJoinException;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.config.RoundConfigNode;
+import net.caseif.flint.exception.round.RoundJoinException;
 import net.caseif.flint.lobby.LobbySign;
+import net.caseif.flint.round.JoinResult;
 import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -60,6 +65,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implements {@link Round}.
@@ -68,6 +74,8 @@ import java.util.UUID;
  */
 @SuppressWarnings("DuplicateThrows")
 public abstract class CommonRound extends CommonMetadataHolder implements Round, CommonComponent<Arena> {
+
+    private AtomicInteger nextSpawn = new AtomicInteger();
 
     private final CommonArena arena;
 
@@ -101,6 +109,11 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
+    public boolean isEnding() {
+        return ending;
+    }
+
+    @Override
     public ImmutableList<Challenger> getChallengers() {
         checkState();
         return ImmutableList.copyOf(challengers.values());
@@ -110,6 +123,38 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     public Optional<Challenger> getChallenger(UUID uuid) throws OrphanedComponentException {
         checkState();
         return Optional.fromNullable(challengers.get(uuid));
+    }
+
+    @SuppressWarnings({"DuplicateThrows", "deprecation"})
+    @Override
+    public Challenger _INVALID_addChallenger(UUID uuid) throws IllegalStateException, RoundJoinException,
+            OrphanedComponentException {
+        JoinResult result = addChallenger(uuid);
+        RoundJoinException.Reason reason;
+        switch (result.getStatus()) {
+            case SUCCESS: {
+                return result.getChallenger();
+            }
+            case INTERNAL_ERROR: {
+                throw new CommonRoundJoinException(uuid, this, result.getThrowable());
+            }
+            case ALREADY_IN_ROUND: {
+                reason = RoundJoinException.Reason.ALREADY_ENTERED;
+                break;
+            }
+            case PLAYER_OFFLINE: {
+                reason = RoundJoinException.Reason.OFFLINE;
+                break;
+            }
+            case ROUND_FULL: {
+                reason = RoundJoinException.Reason.FULL;
+                break;
+            }
+            default: {
+                throw new AssertionError();
+            }
+        }
+        throw new CommonRoundJoinException(uuid, this, reason);
     }
 
     @Override
@@ -134,7 +179,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
      *     {@link LobbySign}s
      */
     public void removeChallenger(Challenger challenger, boolean isDisconnecting, boolean updateSigns,
-            boolean roundEnding) throws OrphanedComponentException {
+                                 boolean roundEnding) throws OrphanedComponentException {
         checkState();
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
@@ -153,6 +198,28 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
 
     public void removeChallenger(Challenger challenger) throws OrphanedComponentException {
         removeChallenger(challenger, false, true, false);
+    }
+
+    @Override
+    public Location3D nextSpawnPoint() {
+        int spawnIndex;
+        switch (getConfigValue(ConfigNode.SPAWNING_MODE)) {
+            case RANDOM: {
+                spawnIndex = (int) Math.floor(Math.random() * getArena().getSpawnPoints().size());
+                break;
+            }
+            case SEQUENTIAL: {
+                spawnIndex = nextSpawn.getAndIncrement();
+                if (nextSpawn.intValue() == getArena().getSpawnPoints().size()) {
+                    nextSpawn.set(0);
+                }
+                break;
+            }
+            default: {
+                throw new AssertionError();
+            }
+        }
+        return getArena().getSpawnPoints().values().asList().get(spawnIndex);
     }
 
     @Override
@@ -230,7 +297,8 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
-    public void setLifecycleStage(LifecycleStage stage) throws OrphanedComponentException {
+    public void setLifecycleStage(LifecycleStage stage, boolean resetTimer) throws IllegalArgumentException,
+            OrphanedComponentException {
         checkState();
         if (stages.contains(stage)) {
             if (!stage.equals(getLifecycleStage())) {
@@ -243,12 +311,20 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
                     i++;
                 }
                 currentStage = i;
+                if (resetTimer) {
+                    time = 0;
+                }
                 getArena().getMinigame().getEventBus()
                         .post(new CommonRoundChangeLifecycleStageEvent(this, getLifecycleStage(), stage));
             }
         } else {
             throw new IllegalArgumentException("Invalid lifecycle stage");
         }
+    }
+
+    @Override
+    public void setLifecycleStage(LifecycleStage stage) throws IllegalArgumentException, OrphanedComponentException {
+        setLifecycleStage(stage, false);
     }
 
     @Override
@@ -373,9 +449,15 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedComponentException {
         checkState();
         config.put(node, value);
+
+        // compatibility
+        if (node == ConfigNode.RANDOM_SPAWNING) {
+            config.put(ConfigNode.SPAWNING_MODE, (Boolean) value ? SpawningMode.RANDOM : SpawningMode.SEQUENTIAL);
+        }
     }
 
     public Map<UUID, Challenger> getChallengerMap() {

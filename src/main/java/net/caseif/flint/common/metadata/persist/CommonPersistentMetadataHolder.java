@@ -41,8 +41,13 @@ public class CommonPersistentMetadataHolder extends CommonMetadataHolder impleme
 
     private PersistentMetadata persistentMetadata = new CommonPersistentMetadata();
 
-    public PersistentMetadata getPersistableMetadata() {
+    public PersistentMetadata getPersistentMetadata() {
         return persistentMetadata;
+    }
+
+    @Deprecated
+    public PersistentMetadata getPersistableMetadata() {
+        return getPersistentMetadata();
     }
 
 }

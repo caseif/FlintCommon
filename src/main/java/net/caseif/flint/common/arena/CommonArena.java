@@ -39,6 +39,7 @@ import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
@@ -51,6 +52,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +63,8 @@ import java.util.Map;
  * @author Max Roncacé
  */
 public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena, CommonComponent<Minigame> {
+
+    protected CommonRollbackHelper rbHelper;
 
     private final CommonMinigame parent;
     private final String id;
@@ -81,6 +86,17 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         checkArgument(initialSpawn.getWorld().isPresent(),
                 "Initial spawn for arena \"" + id + "\" must have world");
         checkArgument(boundary.contains(initialSpawn), "Spawn point must be within arena boundary");
+
+        if (!boundary.getLowerBound().getWorld().isPresent() && !boundary.getUpperBound().getWorld().isPresent()) {
+            Location3D newLower = new Location3D(
+                    initialSpawn.getWorld().get(),
+                    boundary.getLowerBound().getX(),
+                    boundary.getLowerBound().getY(),
+                    boundary.getLowerBound().getZ()
+            );
+            boundary = new Boundary(newLower, boundary.getUpperBound());
+        }
+
         this.parent = parent;
         this.id = id;
         this.name = name;
@@ -146,9 +162,9 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public int addSpawnPoint(Location3D spawn) throws OrphanedComponentException {
         checkState();
-        if (!getBoundary().contains(spawn)) {
-            throw new IllegalArgumentException("Spawn point must be within arena boundary");
-        }
+
+        checkArgument(!getBoundary().contains(spawn), "Spawn point must be within arena boundary");
+
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
@@ -226,6 +242,26 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public Optional<LobbySign> getLobbySignAt(Location3D location) throws IllegalArgumentException {
         return Optional.fromNullable(lobbies.get(location));
+    }
+
+    @Override
+    public void rollback() throws IllegalStateException, OrphanedComponentException {
+        checkState();
+        try {
+            getRollbackHelper().popRollbacks();
+        } catch (IOException | SQLException ex) {
+            throw new RuntimeException("Failed to rollback arena " + getName(), ex);
+        }
+    }
+
+    /**
+     * Gets the {@link CommonRollbackHelper} associated with this {@link CommonArena}.
+     *
+     * @return The {@link CommonRollbackHelper} associated with this
+     *     {@link CommonArena}
+     */
+    public CommonRollbackHelper getRollbackHelper() {
+        return rbHelper;
     }
 
     public HashMap<Location3D, LobbySign> getLobbySignMap() {
