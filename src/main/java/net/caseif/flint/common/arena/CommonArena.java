@@ -48,6 +48,7 @@ import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.Subscribe;
@@ -162,8 +163,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public int addSpawnPoint(Location3D spawn) throws OrphanedComponentException {
         checkState();
-
-        checkArgument(!getBoundary().contains(spawn), "Spawn point must be within arena boundary");
+        checkArgument(getBoundary().contains(spawn), "Spawn point must be within arena boundary");
 
         int id;
         for (id = 0; id <= spawns.size(); id++) {
@@ -185,9 +185,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public void removeSpawnPoint(int index) throws OrphanedComponentException {
         checkState();
-        if (!spawns.containsKey(index)) {
-            throw new IllegalArgumentException("Cannot remove spawn: none exists with given index");
-        }
+        checkArgument(spawns.containsKey(index), "Cannot remove spawn: none exists with given index");
+
         spawns.remove(index);
         try {
             store();
@@ -200,10 +199,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     @Override
     public void removeSpawnPoint(Location3D location) throws OrphanedComponentException {
         checkState();
-
-        if (location.getWorld().isPresent() && !location.getWorld().get().equals(world)) {
-            throw new IllegalArgumentException("Cannot remove spawn: world mismatch in provided location");
-        }
+        checkArgument(!location.getWorld().isPresent() || location.getWorld().get().equals(world),
+                "Cannot remove spawn: world mismatch in provided location");
 
         Location3D loc = new Location3D(world, location.getX(), location.getY(), location.getZ());
 
@@ -213,6 +210,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
                 return;
             }
         }
+
         throw new IllegalArgumentException("Cannot remove spawn: none exists at given location");
     }
 
