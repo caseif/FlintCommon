@@ -106,7 +106,6 @@ public abstract class CommonChallenger extends CommonMetadataHolder implements C
             if (getTeam().isPresent()) {
                 getTeam().get().removeChallenger(this);
             }
-            this.team = null;
             return;
         }
 
