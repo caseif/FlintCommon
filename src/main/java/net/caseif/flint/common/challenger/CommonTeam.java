@@ -109,10 +109,10 @@ public class CommonTeam extends CommonMetadataHolder implements Team, CommonComp
         checkState();
         checkArgument(challenger.getRound() == getRound(),
                 "Cannot add challenger to team: round mismatch");
-        challengers.add(challenger);
         if (challenger.getTeam().isPresent()) {
             challenger.getTeam().get().removeChallenger(challenger);
         }
+        challengers.add(challenger);
         ((CommonChallenger) challenger).justSetTeam(this);
     }
 
@@ -121,6 +121,7 @@ public class CommonTeam extends CommonMetadataHolder implements Team, CommonComp
         checkState();
         checkArgument(challengers.contains(challenger), "Cannot remove challenger from team: not present");
         challengers.remove(challenger);
+        ((CommonChallenger) challenger).justSetTeam(null);
     }
 
     @Override
