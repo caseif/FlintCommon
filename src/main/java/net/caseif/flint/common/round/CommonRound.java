@@ -185,7 +185,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
         if (!challenger.getRound().isEnding()) {
-            challengers.remove(challenger.getUniqueId(), challenger);
+            challengers.remove(challenger.getUniqueId());
             if (updateSigns) {
                 for (LobbySign sign : getArena().getLobbySigns()) {
                     sign.update();
