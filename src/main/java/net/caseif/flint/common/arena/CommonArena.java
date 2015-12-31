@@ -48,14 +48,18 @@ import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,6 +76,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     private String name;
     private final String world;
     private final HashMap<Integer, Location3D> spawns = new HashMap<>();
+    private final List<Location3D> shuffledSpawns;
     private final HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
 
     private Boundary boundary;
@@ -103,6 +108,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         this.name = name;
         this.world = initialSpawn.getWorld().get();
         this.spawns.put(0, initialSpawn);
+        this.shuffledSpawns = Collections.singletonList(initialSpawn);
         this.boundary = boundary;
         CommonMetadata.getEventBus().register(this);
     }
@@ -178,7 +184,10 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         int id;
         for (id = 0; id <= spawns.size(); id++) {
             if (!spawns.containsKey(id)) {
-                spawns.put(id, new Location3D(world, spawn.getX(), spawn.getY(), spawn.getZ()));
+                Location3D spawnLoc = new Location3D(world, spawn.getX(), spawn.getY(), spawn.getZ());
+                spawns.put(id, spawnLoc);
+                shuffledSpawns.add(spawnLoc);
+                Collections.shuffle(shuffledSpawns);
                 try {
                     store();
                 } catch (Exception ex) {
@@ -197,7 +206,11 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         checkState();
         checkArgument(spawns.containsKey(index), "Cannot remove spawn: none exists with given index");
 
-        spawns.remove(index);
+        Location3D removedSpawn = spawns.remove(index);
+
+        shuffledSpawns.remove(removedSpawn);
+        Collections.shuffle(shuffledSpawns);
+
         try {
             store();
         } catch (Exception ex) {
@@ -278,6 +291,11 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
     public HashMap<Integer, Location3D> getSpawnPointMap() {
         return spawns;
+    }
+
+    public ImmutableList<Location3D> getShuffledSpawnPoints() throws OrphanedComponentException {
+        checkState();
+        return ImmutableList.copyOf(shuffledSpawns);
     }
 
     /**

@@ -206,21 +206,28 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         int spawnIndex;
         switch (getConfigValue(ConfigNode.SPAWNING_MODE)) {
             case RANDOM: {
-                spawnIndex = (int) Math.floor(Math.random() * getArena().getSpawnPoints().size());
-                break;
+                return getArena().getSpawnPoints().values().asList()
+                        .get((int) Math.floor(Math.random() * getArena().getSpawnPoints().size()));
             }
             case SEQUENTIAL: {
                 spawnIndex = nextSpawn.getAndIncrement();
                 if (nextSpawn.intValue() == getArena().getSpawnPoints().size()) {
                     nextSpawn.set(0);
                 }
-                break;
+                return getArena().getSpawnPoints().values().asList().get(spawnIndex);
             }
+            case SHUFFLE: {
+                spawnIndex = nextSpawn.getAndIncrement();
+                if (nextSpawn.intValue() == getArena().getSpawnPoints().size()) {
+                    nextSpawn.set(0);
+                }
+                return arena.getShuffledSpawnPoints().asList().get(spawnIndex);
+            }
+            // SpawningMode.PROXIMITY_HIGH is handled by lower-level implementations
             default: {
-                throw new AssertionError();
+                throw new UnsupportedOperationException();
             }
         }
-        return getArena().getSpawnPoints().values().asList().get(spawnIndex);
     }
 
     @Override
