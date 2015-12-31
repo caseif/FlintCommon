@@ -69,7 +69,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
     private final CommonMinigame parent;
     private final String id;
-    private final String name;
+    private String name;
     private final String world;
     private final HashMap<Integer, Location3D> spawns = new HashMap<>();
     private final HashMap<Location3D, LobbySign> lobbies = new HashMap<>();
@@ -126,8 +126,18 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
     @Override
     public String getName() throws OrphanedComponentException {
+        return getDisplayName();
+    }
+
+    @Override
+    public String getDisplayName() throws OrphanedComponentException {
         checkState();
         return name;
+    }
+
+    public void setDisplayName(String displayName) throws OrphanedComponentException {
+        checkState();
+        this.name = displayName;
     }
 
     @Override
