@@ -108,7 +108,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         this.name = name;
         this.world = initialSpawn.getWorld().get();
         this.spawns.put(0, initialSpawn);
-        this.shuffledSpawns = Collections.singletonList(initialSpawn);
+        this.shuffledSpawns = Lists.newArrayList(initialSpawn);
         this.boundary = boundary;
         CommonMetadata.getEventBus().register(this);
     }
