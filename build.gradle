@@ -25,7 +25,7 @@ defaultTasks 'clean', 'licenseFormat', 'build', 'shadowJar'
 
 // Project information
 group = 'net.caseif.flint.common'
-version = '1.2.0-SNAPSHOT'
+version = '1.2.0'
 
 // Extended project information
 ext.projectName = 'flintcommon'
@@ -52,7 +52,7 @@ repositories {
 }
 
 ext {
-    author = 'Max Roncacé'
+    author = 'Max Roncace'
 
     versionSuffix = version.contains('SNAPSHOT') ? (
             (
@@ -64,7 +64,7 @@ ext {
                     + (System.getenv('BUILD_NUMBER') ? '-jnks' + System.getenv('BUILD_NUMBER') : '')
     ) : ''
 
-    flintVersion = '1.2-SNAPSHOT'
+    flintVersion = '1.2'
 
     guava = 'com.google.guava:guava:17.0'
     gson = 'com.google.code.gson:gson:2.2'
