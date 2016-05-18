@@ -23,8 +23,8 @@
  */
 package net.caseif.flint.common.event;
 
-import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.event.FlintEvent;
+import net.caseif.flint.minigame.Minigame;
 
 /**
  * Implements {@link FlintEvent}.

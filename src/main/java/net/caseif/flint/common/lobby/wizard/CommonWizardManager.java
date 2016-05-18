@@ -23,12 +23,8 @@
  */
 package net.caseif.flint.common.lobby.wizard;
 
-import static sun.audio.AudioPlayer.player;
-
-import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.minigame.Minigame;
-import net.caseif.flint.util.physical.Location3D;
 
 import java.util.HashMap;
 import java.util.UUID;

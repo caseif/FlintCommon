@@ -24,7 +24,6 @@
 package net.caseif.flint.common.challenger;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.challenger.Team;
 import net.caseif.flint.common.CommonCore;

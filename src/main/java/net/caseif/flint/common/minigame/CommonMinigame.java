@@ -31,14 +31,14 @@ import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.util.physical.Boundary;
+import net.caseif.flint.util.physical.Location3D;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
-import net.caseif.flint.util.physical.Boundary;
-import net.caseif.flint.util.physical.Location3D;
 
 import java.io.IOException;
 import java.util.HashMap;

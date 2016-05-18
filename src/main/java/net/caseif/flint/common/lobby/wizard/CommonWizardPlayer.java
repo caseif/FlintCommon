@@ -26,7 +26,6 @@ package net.caseif.flint.common.lobby.wizard;
 import static net.caseif.flint.common.lobby.wizard.WizardMessages.EM_COLOR;
 import static net.caseif.flint.common.lobby.wizard.WizardMessages.ERROR_COLOR;
 import static net.caseif.flint.common.lobby.wizard.WizardMessages.INFO_COLOR;
-
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.lobby.LobbySign;
