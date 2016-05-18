@@ -36,7 +36,8 @@ public class WizardMessages {
 
     // informational messages
     public static final String WELCOME = INFO_COLOR + "Welcome to the lobby sign wizard!";
-    public static final String CHAT_WITHHOLDING = INFO_COLOR + "Chat messages will be withheld until the wizard is complete.";
+    public static final String CHAT_WITHHOLDING = INFO_COLOR + "Chat messages will be withheld until the wizard is "
+            + "complete.";
     public static final String GET_ARENA = INFO_COLOR + "To start, please type "
             + "the name of the arena you would like to create a lobby sign for. (You may type " + EM_COLOR + " cancel "
             + INFO_COLOR + " at any time to exit the wizard.";
@@ -57,7 +58,8 @@ public class WizardMessages {
     public static final String CONFIRM_2 = INFO_COLOR + "Is this okay? "
             + "(Type " + EM_COLOR + "yes" + INFO_COLOR + " or " + EM_COLOR + "no" + INFO_COLOR + ".)";
     public static final String RESET = INFO_COLOR + "The wizard will now reset.";
-    public static final String FINISH = INFO_COLOR + "Your lobby sign was successfully created! The wizard will now exit.";
+    public static final String FINISH = INFO_COLOR + "Your lobby sign was successfully created! The wizard will now "
+            + "exit.";
     public static final String MESSAGE_PLAYBACK = INFO_COLOR + "Playing back withheld chat messages...";
 
     public static final String CANCELLED = ERROR_COLOR + "Lobby sign creation cancelled.";
@@ -65,13 +67,14 @@ public class WizardMessages {
     // error messages
     public static final String BAD_ARENA = ERROR_COLOR + "No arena by that ID exists! Please enter another arena ID.";
     public static final String BAD_TYPE = ERROR_COLOR + "Invalid sign type! Please select a valid option.";
-    public static final String BAD_INDEX = ERROR_COLOR + "Invalid sign index! Please enter a number greater than or equal to "
-            + "1.";
+    public static final String BAD_INDEX = ERROR_COLOR + "Invalid sign index! Please enter a number greater than or "
+            + "equal to 1.";
     public static final String BAD_CONFIRMATION = ERROR_COLOR + "Please type " + EM_COLOR + "yes" + INFO_COLOR + " or "
             + EM_COLOR + "no" + INFO_COLOR + ".";
-    public static final String ARENA_REMOVED = ERROR_COLOR + "The selected arena has been removed. The wizard will now exit.";
-    public static final String GENERIC_ERROR = ERROR_COLOR + "An internal exception occurred while creating the lobby sign. "
-            + "The wizard will now exit.";
+    public static final String ARENA_REMOVED = ERROR_COLOR + "The selected arena has been removed. The wizard will now "
+    + "exit.";
+    public static final String GENERIC_ERROR = ERROR_COLOR + "An internal exception occurred while creating the lobby "
+            + "sign. The wizard will now exit.";
 
     // other stuff
     public static final String DIVIDER;
