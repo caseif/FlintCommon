@@ -23,8 +23,12 @@
  */
 package net.caseif.flint.common.lobby.wizard;
 
+import static sun.audio.AudioPlayer.player;
+
+import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.util.physical.Location3D;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -56,6 +60,11 @@ public abstract class CommonWizardManager implements IWizardManager {
     }
 
     @Override
+    public void removePlayer(UUID uuid) {
+        wizardPlayers.remove(uuid);
+    }
+
+    @Override
     public String[] accept(UUID uuid, String input) {
         if (wizardPlayers.containsKey(uuid)) {
             return wizardPlayers.get(uuid).accept(input);
@@ -71,11 +80,6 @@ public abstract class CommonWizardManager implements IWizardManager {
         } else {
             throw new IllegalArgumentException("Player with UUID " + uuid.toString() + " is not engaged in a wizard");
         }
-    }
-
-    @Override
-    public void removePlayer(UUID uuid) {
-        wizardPlayers.remove(uuid);
     }
 
 }

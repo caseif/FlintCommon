@@ -27,6 +27,7 @@ import net.caseif.flint.FlintCore;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
+import net.caseif.flint.common.util.agent.chat.IChatAgent;
 import net.caseif.flint.minigame.Minigame;
 
 import com.google.common.base.Optional;
@@ -128,5 +129,11 @@ public abstract class CommonCore extends FlintCore {
     }
 
     protected abstract void orphan0(CommonComponent<?> component);
+
+    public static IChatAgent getChatAgent() {
+        return ((CommonCore) INSTANCE).getChatAgent0();
+    }
+
+    protected abstract IChatAgent getChatAgent0();
 
 }

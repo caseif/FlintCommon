@@ -26,7 +26,7 @@ package net.caseif.flint.common.lobby.wizard;
 /**
  * Represents a stage in the lobby wizard.
  */
-public enum WizardStage {
+enum WizardStage {
 
     GET_ARENA,
     GET_TYPE,
