@@ -26,6 +26,13 @@ package net.caseif.flint.common.arena;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.eventbus.Subscribe;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.component.CommonComponent;
@@ -36,22 +43,16 @@ import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
+import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.round.LifecycleStage;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.eventbus.Subscribe;
-
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -136,6 +137,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         return name;
     }
 
+    @Override
     public void setDisplayName(String displayName) throws OrphanedComponentException {
         checkState();
         this.name = displayName;
@@ -238,6 +240,26 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         return Optional.fromNullable(parent.getRoundMap().get(this));
     }
 
+    @Override
+    public Round createRound() throws IllegalStateException, OrphanedComponentException {
+        checkState();
+        Preconditions.checkState(!getRound().isPresent(), "Cannot create a round in an arena already hosting one");
+        ImmutableSet<LifecycleStage> stages = getMinigame().getConfigValue(ConfigNode.DEFAULT_LIFECYCLE_STAGES);
+        Preconditions.checkState(stages != null && !stages.isEmpty(),
+                "Illegal call to nullary createRound method: default lifecycle stages are not set");
+        return createRound(getMinigame().getConfigValue(ConfigNode.DEFAULT_LIFECYCLE_STAGES));
+    }
+
+    @Override
+    public Round getOrCreateRound() {
+        return getRound().isPresent() ? getRound().get() : createRound();
+    }
+
+    @Override
+    public Round getOrCreateRound(ImmutableSet<LifecycleStage> stages) {
+        return getRound().isPresent() ? getRound().get() : createRound(stages);
+    }
+
     @Subscribe
     public void onMetadataMutate(PersistableMetadataMutateEvent event) {
         if (event.getMetadata() == getMetadata()) { // check whether event pertains to this arena's metadata
@@ -332,5 +354,13 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
      */
     //TODO: possibly change this design to be more efficient
     public abstract void store() throws Exception;
+
+    /**
+     * Removes this arena from persistent storage.
+     *
+     * @throws IOException If an exception occurs while writing to the
+     *     persistent store
+     */
+    public abstract void removeFromStore() throws IOException;
 
 }

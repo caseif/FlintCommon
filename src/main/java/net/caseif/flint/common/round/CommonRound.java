@@ -35,6 +35,8 @@ import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.event.round.CommonRoundChangeLifecycleStageEvent;
 import net.caseif.flint.common.event.round.CommonRoundEndEvent;
 import net.caseif.flint.common.event.round.CommonRoundTimerChangeEvent;
+import net.caseif.flint.common.event.round.CommonRoundTimerStartEvent;
+import net.caseif.flint.common.event.round.CommonRoundTimerStopEvent;
 import net.caseif.flint.common.exception.round.CommonRoundJoinException;
 import net.caseif.flint.common.metadata.CommonMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
@@ -84,6 +86,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     protected boolean ending;
     protected int currentStage = 0;
     private long time;
+    private boolean timerTicking = true;
 
     public CommonRound(CommonArena arena, ImmutableSet<LifecycleStage> stages) {
         assert arena != null;
@@ -422,6 +425,22 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     public void end(boolean rollback) throws IllegalStateException, OrphanedComponentException {
         checkState();
         end(rollback, false);
+    }
+
+    @Override
+    public boolean isTimerTicking() throws OrphanedComponentException {
+        checkState();
+        return this.timerTicking;
+    }
+
+    @Override
+    public void setTimerTicking(boolean ticking) throws OrphanedComponentException {
+        checkState();
+        if (ticking != isTimerTicking()) {
+            timerTicking = ticking;
+            getArena().getMinigame().getEventBus()
+                    .post(ticking ? new CommonRoundTimerStartEvent(this) : new CommonRoundTimerStopEvent(this));
+        }
     }
 
     public void end(boolean rollback, boolean natural) throws IllegalStateException, OrphanedComponentException {
