@@ -40,7 +40,7 @@ public class CommonDataFiles {
 
     static final String ROOT_DATA_DIR = "flint_data";
 
-    public static final CoreDataFile OFFLINE_PLAYER_STORE = new CoreDataFile("offline_players.yml");
+    public static final CoreDataFile OFFLINE_PLAYER_STORE = new CoreDataFile("offline_players.json");
     public static final CoreDataFile PLAYER_INVENTORY_DIR = new CoreDataFile("inventories", true);
     public static final CoreDataFile PLAYER_LOCATION_STORE = new CoreDataFile("locs.yml");
 

@@ -67,7 +67,7 @@ ext {
     flintVersion = '1.2'
 
     guava = 'com.google.guava:guava:17.0'
-    gson = 'com.google.code.gson:gson:2.2'
+    gson = 'com.google.code.gson:gson:2.2.4'
     flint = 'net.caseif.flint:flint:' + flintVersion
 }
 

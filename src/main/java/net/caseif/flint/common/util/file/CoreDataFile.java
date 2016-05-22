@@ -24,7 +24,6 @@
 package net.caseif.flint.common.util.file;
 
 import net.caseif.flint.common.CommonCore;
-import net.caseif.flint.minigame.Minigame;
 
 import java.io.File;
 
@@ -44,11 +43,9 @@ public class CoreDataFile extends DataFile {
     }
 
     /**
-     * Gets the {@link File} backing this {@link CoreDataFile} for the given
-     * {@link Minigame}.
+     * Gets the {@link File} backing this {@link CoreDataFile}.
      *
-     * @return The {@link File} backing this {@link CoreDataFile} for the
-     *     given {@link Minigame}.
+     * @return The {@link File} backing this {@link CoreDataFile}
      */
     public File getFile() {
         return new File(CommonCore.PLATFORM_UTILS.getDataFolder(),
