@@ -42,7 +42,7 @@ public class CommonDataFiles {
 
     public static final CoreDataFile OFFLINE_PLAYER_STORE = new CoreDataFile("offline_players.json");
     public static final CoreDataFile PLAYER_INVENTORY_DIR = new CoreDataFile("inventories", true);
-    public static final CoreDataFile PLAYER_LOCATION_STORE = new CoreDataFile("locs.yml");
+    public static final CoreDataFile PLAYER_LOCATION_STORE = new CoreDataFile("locs.json");
 
     public static final MinigameDataFile ARENA_STORE = new MinigameDataFile("arenas.yml");
     public static final MinigameDataFile LOBBY_STORE = new MinigameDataFile("lobbies.yml");
