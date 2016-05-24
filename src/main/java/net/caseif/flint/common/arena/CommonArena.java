@@ -33,6 +33,8 @@ import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.common.util.file.CommonDataFiles;
+import net.caseif.flint.common.util.helper.MetadataHelper;
 import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
@@ -50,8 +52,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,6 +73,14 @@ import java.util.Map;
  * @author Max Roncacé
  */
 public abstract class CommonArena extends CommonPersistentMetadataHolder implements Arena, CommonComponent<Minigame> {
+
+    //TODO: move to designated class for constants
+    public static final String PERSISTENCE_NAME_KEY = "name";
+    public static final String PERSISTENCE_WORLD_KEY = "world";
+    public static final String PERSISTENCE_SPAWNS_KEY = "spawns";
+    public static final String PERSISTENCE_BOUNDS_UPPER_KEY = "bound.upper";
+    public static final String PERSISTENCE_BOUNDS_LOWER_KEY = "bound.lower";
+    public static final String PERSISTENCE_METADATA_KEY = "metadata";
 
     protected CommonRollbackHelper rbHelper;
 
@@ -79,7 +96,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
     private boolean orphan = false;
 
-    public CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
+    protected CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
             throws IllegalArgumentException {
         assert parent != null;
         assert id != null;
@@ -348,12 +365,78 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     }
 
     /**
-     * Saves this {@link Arena} to persistent storage.
+     * Configures this {@link CommonArena} from the given {@link JsonObject}.
      *
-     * @throws Exception If an {@link Exception} is thrown while saving to disk.
+     * @param json The {@link JsonObject} containing data for this
+     *     {@link CommonArena}
      */
-    //TODO: possibly change this design to be more efficient
-    public abstract void store() throws Exception;
+    public void configure(JsonObject json) {
+        {
+            JsonObject spawnSection = json.getAsJsonObject(PERSISTENCE_SPAWNS_KEY);
+            for (Map.Entry<String, JsonElement> entry : spawnSection.entrySet()) {
+                try {
+                    int index = Integer.parseInt(entry.getKey());
+                    getSpawnPointMap()
+                            .put(index, Location3D.deserialize(spawnSection.get(entry.getKey()).getAsString()));
+                } catch (IllegalArgumentException ignored) {
+                    CommonCore.logWarning("Invalid spawn at index " + entry.getKey() + " for arena \"" + getId()
+                            + "\"");
+                }
+            }
+        }
+
+        if (json.has(PERSISTENCE_METADATA_KEY) && json.get(PERSISTENCE_METADATA_KEY).isJsonObject()) {
+            MetadataHelper.loadMetadata(json.getAsJsonObject(PERSISTENCE_METADATA_KEY), getPersistentMetadata());
+        }
+    }
+
+    /**
+     * Stores this arena into persistent storage.
+     *
+     * @throws IOException If an exception occurs while writing to the
+     *     persistent store
+     */
+    public void store() throws IOException {
+        File arenaStore = CommonDataFiles.ARENA_STORE.getFile(getMinigame());
+
+        JsonObject json;
+        if (arenaStore.exists()) {
+            try (FileReader reader = new FileReader(arenaStore)) {
+                JsonElement el = new JsonParser().parse(reader);
+                if (el.isJsonObject()) {
+                    json = el.getAsJsonObject();
+                } else {
+                    json = new JsonObject();
+                }
+            }
+        } else {
+            Files.createFile(arenaStore.toPath());
+            json = new JsonObject();
+        }
+
+        JsonObject jsonArena = new JsonObject();
+        jsonArena.addProperty(PERSISTENCE_NAME_KEY, getName());
+        jsonArena.addProperty(PERSISTENCE_WORLD_KEY, getWorld());
+
+        JsonObject spawns = new JsonObject();
+        for (Map.Entry<Integer, Location3D> entry : getSpawnPoints().entrySet()) {
+            spawns.addProperty(entry.getKey().toString(), entry.getValue().serialize());
+        }
+        jsonArena.add(PERSISTENCE_SPAWNS_KEY, spawns);
+
+        jsonArena.addProperty(PERSISTENCE_BOUNDS_UPPER_KEY, getBoundary().getUpperBound().serialize());
+        jsonArena.addProperty(PERSISTENCE_BOUNDS_LOWER_KEY, getBoundary().getLowerBound().serialize());
+
+        JsonObject metadata = new JsonObject();
+        MetadataHelper.storeMetadata(metadata, getPersistentMetadata());
+        jsonArena.add(PERSISTENCE_METADATA_KEY, metadata);
+
+        json.add(this.getId(), jsonArena);
+
+        try (FileWriter writer = new FileWriter(arenaStore)) {
+            writer.write(json.toString());
+        }
+    }
 
     /**
      * Removes this arena from persistent storage.
@@ -361,6 +444,29 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
      * @throws IOException If an exception occurs while writing to the
      *     persistent store
      */
-    public abstract void removeFromStore() throws IOException;
+    public void removeFromStore() throws IOException {
+        File arenaStore = CommonDataFiles.ARENA_STORE.getFile(getMinigame());
+
+        if (!arenaStore.exists()) {
+            throw new IllegalStateException("Arena store does not exist!");
+        }
+
+        JsonObject json = new JsonObject();
+        try (FileReader reader = new FileReader(arenaStore)) {
+            JsonElement el = new JsonParser().parse(reader);
+            if (el.isJsonObject()) {
+                json = el.getAsJsonObject();
+            } else {
+                CommonCore.logWarning("Root element of arena store is not object - overwriting");
+                Files.delete(arenaStore.toPath());
+            }
+        }
+
+        json.remove(this.getId());
+
+        try (FileWriter writer = new FileWriter(arenaStore)) {
+            writer.write(json.toString());
+        }
+    }
 
 }

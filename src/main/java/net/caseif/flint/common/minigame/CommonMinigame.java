@@ -28,6 +28,7 @@ import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
+import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
@@ -39,7 +40,12 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,6 +140,63 @@ public abstract class CommonMinigame implements Minigame {
         }
         ((CommonArena) arena).orphan();
     }
+
+    protected void loadArenas() {
+        File arenaStore = CommonDataFiles.ARENA_STORE.getFile(this);
+        if (!arenaStore.exists()) {
+            return;
+        }
+
+        JsonObject json;
+        try {
+            try (FileReader reader = new FileReader(arenaStore)) {
+                JsonElement el = new JsonParser().parse(reader);
+                if (el.isJsonObject()) {
+                    json = el.getAsJsonObject(); // BIG-ASS TODO
+                } else {
+                    System.out.println(el);
+                    CommonCore.logWarning("Root of arena store is not object. Not reading arenas.");
+                    return;
+                }
+            }
+
+            for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+                if (json.get(entry.getKey()).isJsonObject()) {
+                    JsonObject arenaJson = json.getAsJsonObject(entry.getKey());
+                    if (arenaJson.has(CommonArena.PERSISTENCE_NAME_KEY)
+                            && arenaJson.has(CommonArena.PERSISTENCE_WORLD_KEY)) {
+                        Location3D upperBound = Location3D.deserialize(
+                                arenaJson.get(CommonArena.PERSISTENCE_BOUNDS_UPPER_KEY).getAsString()
+                        );
+                        Location3D lowerBound = Location3D.deserialize(
+                                arenaJson.get(CommonArena.PERSISTENCE_BOUNDS_LOWER_KEY).getAsString()
+                        );
+                        CommonArena arena = CommonCore.getArenaFactory().createArena(
+                                this,
+                                entry.getKey().toLowerCase(),
+                                arenaJson.get(CommonArena.PERSISTENCE_NAME_KEY).getAsString(),
+                                new Location3D(arenaJson.get(CommonArena.PERSISTENCE_WORLD_KEY).getAsString(),
+                                        lowerBound.getX(), lowerBound.getY(), lowerBound.getZ()),
+                                new Boundary(
+                                        upperBound,
+                                        lowerBound
+                                )
+                        );
+                        arena.getSpawnPointMap().remove(0); // remove initial placeholder spawn
+                        arena.configure(arenaJson);
+                        getArenaMap().put(arena.getId(), arena);
+                    } else {
+                        CommonCore.logWarning("Invalid object \"" + entry.getKey() + "\"in arena store");
+                    }
+                } else {
+                    CommonCore.logWarning("Found non-object for key \"" + entry.getKey() + "\" - not loading");
+                }
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to load existing arenas from disk", ex);
+        }
+    }
+
 
     @Override
     public ImmutableList<Round> getRounds() {

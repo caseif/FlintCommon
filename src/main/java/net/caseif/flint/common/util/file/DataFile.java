@@ -39,11 +39,25 @@ public abstract class DataFile {
      * @param fileName The name of the file backing the new
      *     {@link DataFile}
      * @param isDirectory Whether this {@link DataFile} is a directory
+     * @param createIfMissing Whether the file should be created if it is not
+     *     present on the filesystem
      */
-    public DataFile(String fileName, boolean isDirectory) {
+    public DataFile(String fileName, boolean isDirectory, boolean createIfMissing) {
         this.fileName = fileName;
         this.directory = isDirectory;
-        CommonDataFiles.register(this);
+        if (createIfMissing) {
+            CommonDataFiles.register(this);
+        }
+    }
+    /**
+     * Constructs a new {@link DataFile}.
+     *
+     * @param fileName The name of the file backing the new
+     *     {@link DataFile}
+     * @param isDirectory Whether this {@link DataFile} is a directory
+     */
+    public DataFile(String fileName, boolean isDirectory) {
+        this(fileName, isDirectory, true);
     }
 
     /**

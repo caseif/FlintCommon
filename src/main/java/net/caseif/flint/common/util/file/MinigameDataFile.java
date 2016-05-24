@@ -35,6 +35,10 @@ import java.io.File;
  */
 public class MinigameDataFile extends DataFile {
 
+    public MinigameDataFile(String fileName, boolean isDirectory, boolean createIfMissing) {
+        super(fileName, isDirectory, createIfMissing);
+    }
+
     public MinigameDataFile(String fileName, boolean isDirectory) {
         super(fileName, isDirectory);
     }

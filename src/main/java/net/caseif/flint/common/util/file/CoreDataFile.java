@@ -34,6 +34,10 @@ import java.io.File;
  */
 public class CoreDataFile extends DataFile {
 
+    public CoreDataFile(String fileName, boolean isDirectory, boolean createIfMissing) {
+        super(fileName, isDirectory, createIfMissing);
+    }
+
     public CoreDataFile(String fileName, boolean isDirectory) {
         super(fileName, isDirectory);
     }
