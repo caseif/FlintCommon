@@ -25,6 +25,8 @@ package net.caseif.flint.common.arena;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
+import static net.caseif.flint.common.util.helper.JsonSerializer.serializeLocation;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.component.CommonComponent;
@@ -34,7 +36,7 @@ import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.util.file.CommonDataFiles;
-import net.caseif.flint.common.util.helper.MetadataHelper;
+import net.caseif.flint.common.util.helper.JsonSerializer;
 import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
@@ -377,7 +379,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
                 try {
                     int index = Integer.parseInt(entry.getKey());
                     getSpawnPointMap()
-                            .put(index, Location3D.deserialize(spawnSection.get(entry.getKey()).getAsString()));
+                            .put(index, deserializeLocation(spawnSection.getAsJsonObject(entry.getKey())));
                 } catch (IllegalArgumentException ignored) {
                     CommonCore.logWarning("Invalid spawn at index " + entry.getKey() + " for arena \"" + getId()
                             + "\"");
@@ -386,7 +388,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         }
 
         if (json.has(PERSISTENCE_METADATA_KEY) && json.get(PERSISTENCE_METADATA_KEY).isJsonObject()) {
-            MetadataHelper.loadMetadata(json.getAsJsonObject(PERSISTENCE_METADATA_KEY), getPersistentMetadata());
+            JsonSerializer.deserializeMetadata(json.getAsJsonObject(PERSISTENCE_METADATA_KEY), getPersistentMetadata());
         }
     }
 
@@ -420,15 +422,15 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
         JsonObject spawns = new JsonObject();
         for (Map.Entry<Integer, Location3D> entry : getSpawnPoints().entrySet()) {
-            spawns.addProperty(entry.getKey().toString(), entry.getValue().serialize());
+            spawns.add(entry.getKey().toString(), serializeLocation(entry.getValue()));
         }
         jsonArena.add(PERSISTENCE_SPAWNS_KEY, spawns);
 
-        jsonArena.addProperty(PERSISTENCE_BOUNDS_UPPER_KEY, getBoundary().getUpperBound().serialize());
-        jsonArena.addProperty(PERSISTENCE_BOUNDS_LOWER_KEY, getBoundary().getLowerBound().serialize());
+        jsonArena.add(PERSISTENCE_BOUNDS_UPPER_KEY, serializeLocation(getBoundary().getUpperBound()));
+        jsonArena.add(PERSISTENCE_BOUNDS_LOWER_KEY, serializeLocation(getBoundary().getLowerBound()));
 
         JsonObject metadata = new JsonObject();
-        MetadataHelper.storeMetadata(metadata, getPersistentMetadata());
+        JsonSerializer.serializeMetadata(metadata, getPersistentMetadata());
         jsonArena.add(PERSISTENCE_METADATA_KEY, metadata);
 
         json.add(this.getId(), jsonArena);

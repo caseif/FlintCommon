@@ -1,5 +1,7 @@
 package net.caseif.flint.common.util.helper;
 
+import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
+import static net.caseif.flint.common.util.helper.JsonSerializer.serializeLocation;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.util.physical.Location3D;
@@ -16,7 +18,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 public class CommonPlayerHelper {
@@ -100,7 +101,7 @@ public class CommonPlayerHelper {
             json = new JsonObject();
         }
 
-        json.addProperty(player.toString(), location.serialize());
+        json.add(player.toString(), serializeLocation(location));
 
         try (FileWriter writer = new FileWriter(store)) {
             writer.append(json.toString());
@@ -130,14 +131,8 @@ public class CommonPlayerHelper {
         }
 
         if (json.has(player.toString())) {
-            Location3D l3d = Location3D.deserialize(json.get(player.toString()).getAsString());
-            for (Map.Entry<String, JsonElement> e : json.entrySet()) {
-                CommonCore.logInfo("before: " + e.getKey());
-            }
+            Location3D l3d = deserializeLocation(json.getAsJsonObject(player.toString()));
             json.remove(player.toString());
-            for (Map.Entry<String, JsonElement> e : json.entrySet()) {
-                CommonCore.logInfo("after: " + e.getKey());
-            }
 
             try (FileWriter writer = new FileWriter(store)) {
                 writer.append(json.toString());

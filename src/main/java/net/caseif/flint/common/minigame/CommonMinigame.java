@@ -23,6 +23,7 @@
  */
 package net.caseif.flint.common.minigame;
 
+import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.CommonCore;
@@ -165,11 +166,11 @@ public abstract class CommonMinigame implements Minigame {
                     JsonObject arenaJson = json.getAsJsonObject(entry.getKey());
                     if (arenaJson.has(CommonArena.PERSISTENCE_NAME_KEY)
                             && arenaJson.has(CommonArena.PERSISTENCE_WORLD_KEY)) {
-                        Location3D upperBound = Location3D.deserialize(
-                                arenaJson.get(CommonArena.PERSISTENCE_BOUNDS_UPPER_KEY).getAsString()
+                        Location3D upperBound = deserializeLocation(
+                                arenaJson.getAsJsonObject(CommonArena.PERSISTENCE_BOUNDS_UPPER_KEY)
                         );
-                        Location3D lowerBound = Location3D.deserialize(
-                                arenaJson.get(CommonArena.PERSISTENCE_BOUNDS_LOWER_KEY).getAsString()
+                        Location3D lowerBound = deserializeLocation(
+                                arenaJson.getAsJsonObject(CommonArena.PERSISTENCE_BOUNDS_LOWER_KEY)
                         );
                         CommonArena arena = CommonCore.getArenaFactory().createArena(
                                 this,
