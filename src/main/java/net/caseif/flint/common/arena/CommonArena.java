@@ -36,10 +36,10 @@ import net.caseif.flint.common.lobby.CommonLobbySign;
 import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
+import net.caseif.flint.common.util.agent.rollback.IRollbackAgent;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.common.util.helper.JsonSerializer;
-import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.lobby.LobbySign;
@@ -86,7 +86,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     public static final String PERSISTENCE_BOUNDS_LOWER_KEY = "bound.lower";
     public static final String PERSISTENCE_METADATA_KEY = "metadata";
 
-    protected CommonRollbackHelper rbHelper;
+    private IRollbackAgent rbHelper;
 
     private final CommonMinigame parent;
     private final String id;
@@ -127,6 +127,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         this.spawns.put(0, initialSpawn);
         this.shuffledSpawns = Lists.newArrayList(initialSpawn);
         this.boundary = boundary;
+
+        this.rbHelper = CommonCore.getFactoryRegistry().getRollbackAgentFactory().createRollbackAgent(this);
         CommonMetadata.getEventBus().register(this);
     }
 
@@ -272,6 +274,18 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     }
 
     @Override
+    public Round createRound(ImmutableSet<LifecycleStage> stages)
+            throws IllegalArgumentException, IllegalStateException, OrphanedComponentException {
+        checkState();
+        Preconditions.checkState(!getRound().isPresent(), "Cannot create a round in an arena already hosting one");
+        checkArgument(stages != null && !stages.isEmpty(), "LifecycleStage set must not be null or empty");
+        ((CommonMinigame) getMinigame()).getRoundMap()
+                .put(this, CommonCore.getFactoryRegistry().getRoundFactory().createRound(this, stages));
+        Preconditions.checkState(getRound().isPresent(), "Cannot get created round from arena! This is a bug.");
+        return getRound().get();
+    }
+
+    @Override
     public Round getOrCreateRound() {
         return getRound().isPresent() ? getRound().get() : createRound();
     }
@@ -307,19 +321,19 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     public void rollback() throws IllegalStateException, OrphanedComponentException {
         checkState();
         try {
-            getRollbackHelper().popRollbacks();
+            getRollbackAgent().popRollbacks();
         } catch (IOException | SQLException ex) {
             throw new RuntimeException("Failed to rollback arena " + getName(), ex);
         }
     }
 
     /**
-     * Gets the {@link CommonRollbackHelper} associated with this {@link CommonArena}.
+     * Gets the {@link IRollbackAgent} associated with this {@link CommonArena}.
      *
-     * @return The {@link CommonRollbackHelper} associated with this
+     * @return The {@link IRollbackAgent} associated with this
      *     {@link CommonArena}
      */
-    public CommonRollbackHelper getRollbackHelper() {
+    public IRollbackAgent getRollbackAgent() {
         return rbHelper;
     }
 

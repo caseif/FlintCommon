@@ -28,7 +28,7 @@ import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.common.util.agent.chat.IChatAgent;
-import net.caseif.flint.common.util.factory.IArenaFactory;
+import net.caseif.flint.common.util.factory.IFactoryRegistry;
 import net.caseif.flint.minigame.Minigame;
 
 import com.google.common.base.Optional;
@@ -50,6 +50,17 @@ public abstract class CommonCore extends FlintCore {
      * The singleton {@link PlatformUtils} instance.
      */
     public static PlatformUtils PLATFORM_UTILS;
+
+    @Override
+    protected Minigame registerPlugin0(String pluginId) throws IllegalStateException {
+        if (getMinigames().containsKey(pluginId)) {
+            throw new IllegalStateException(pluginId + " attempted to register itself more than once");
+        }
+        Minigame minigame = getFactoryRegistry0().getMinigameFactory().createMinigame(pluginId);
+        getMinigames().put(pluginId, minigame);
+
+        return minigame;
+    }
 
     /**
      * Returns the object mapping plugin names to their respective minigames (no
@@ -137,10 +148,10 @@ public abstract class CommonCore extends FlintCore {
 
     protected abstract IChatAgent getChatAgent0();
 
-    protected abstract IArenaFactory getArenaFactory0();
+    protected abstract IFactoryRegistry getFactoryRegistry0();
 
-    public static IArenaFactory getArenaFactory() {
-        return ((CommonCore) INSTANCE).getArenaFactory0();
+    public static IFactoryRegistry getFactoryRegistry() {
+        return ((CommonCore) INSTANCE).getFactoryRegistry0();
     }
 
 }

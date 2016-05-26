@@ -168,7 +168,7 @@ public abstract class CommonMinigame implements Minigame {
                         Location3D lowerBound = deserializeLocation(
                                 arenaJson.getAsJsonObject(CommonArena.PERSISTENCE_BOUNDS_LOWER_KEY)
                         );
-                        CommonArena arena = CommonCore.getArenaFactory().createArena(
+                        CommonArena arena = CommonCore.getFactoryRegistry().getArenaFactory().createArena(
                                 this,
                                 entry.getKey().toLowerCase(),
                                 arenaJson.get(CommonArena.PERSISTENCE_NAME_KEY).getAsString(),

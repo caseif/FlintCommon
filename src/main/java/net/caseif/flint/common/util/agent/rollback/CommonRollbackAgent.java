@@ -21,11 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.caseif.flint.common.util.helper.rollback;
+package net.caseif.flint.common.util.agent.rollback;
 
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
+import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.util.physical.Location3D;
 
@@ -53,29 +54,31 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
-public abstract class CommonRollbackHelper implements ICommonRollbackHelper {
+public abstract class CommonRollbackAgent implements IRollbackAgent {
 
-    public static final String SQLITE_PROTOCOL = "jdbc:sqlite:";
-    public static final Properties SQL_QUERIES = new Properties();
+    private static final String SQLITE_PROTOCOL = "jdbc:sqlite:";
+    private static final Properties SQL_QUERIES = new Properties();
 
     protected static final int RECORD_TYPE_BLOCK_CHANGED = 0;
     protected static final int RECORD_TYPE_ENTITY_CREATED = 1;
     protected static final int RECORD_TYPE_ENTITY_CHANGED = 2;
 
-    protected final File rollbackStore;
-    protected final File stateStore;
-
     private final CommonArena arena;
 
-    protected CommonRollbackHelper(CommonArena arena, File rollbackStore, File stateStore) {
+    private final File rollbackStore;
+    private final File stateStore;
+
+    protected CommonRollbackAgent(CommonArena arena) {
         this.arena = arena;
-        this.rollbackStore = rollbackStore;
-        this.stateStore = stateStore;
+
+        rollbackStore = CommonDataFiles.ROLLBACK_STORE.getFile(getArena().getMinigame());
+        stateStore = CommonDataFiles.ROLLBACK_STATE_STORE.getFile(getArena().getMinigame());
+
         initializeStateStore();
     }
 
     static {
-        try (InputStream is = CommonRollbackHelper.class.getResourceAsStream("/sql-queries.properties")) {
+        try (InputStream is = CommonRollbackAgent.class.getResourceAsStream("/sql-queries.properties")) {
             SQL_QUERIES.load(is);
         } catch (IOException ex) {
             throw new RuntimeException("Failed to load SQL query strings", ex);
@@ -84,10 +87,10 @@ public abstract class CommonRollbackHelper implements ICommonRollbackHelper {
 
     /**
      * Returns the {@link CommonArena} associated with this
-     * {@link CommonRollbackHelper}.
+     * {@link CommonRollbackAgent}.
      *
      * @return The {@link CommonArena} associated with this
-     * {@link CommonRollbackHelper}.
+     * {@link CommonRollbackAgent}.
      */
     public CommonArena getArena() {
         return arena;
@@ -95,7 +98,7 @@ public abstract class CommonRollbackHelper implements ICommonRollbackHelper {
 
     /**
      * Creates a rollback database for the arena backing this
-     * {@link CommonRollbackHelper}.
+     * {@link CommonRollbackAgent}.
      *
      * @throws IOException If an exception occurs while creating the database
      *     file

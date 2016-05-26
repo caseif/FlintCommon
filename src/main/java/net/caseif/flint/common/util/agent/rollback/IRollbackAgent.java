@@ -21,42 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.caseif.flint.common.util.helper;
+package net.caseif.flint.common.util.agent.rollback;
 
-import com.google.common.base.Optional;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import net.caseif.flint.util.physical.Location3D;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.UUID;
 
-public class JsonHelper {
+public interface IRollbackAgent {
 
-    public static JsonObject readOrCreateJson(File file) throws IOException {
-        if (file.exists()) {
-            try (FileReader reader = new FileReader(file)) {
-                JsonElement el = new JsonParser().parse(reader);
-                return el.isJsonObject() ? el.getAsJsonObject() : new JsonObject();
-            }
-        } else {
-            Files.createFile(file.toPath());
-            return new JsonObject();
-        }
-    }
+    void createRollbackDatabase() throws IOException, SQLException;
 
-    public static Optional<JsonObject> readJson(File file) throws IllegalArgumentException, IOException {
-        if (file.exists()) {
-            try (FileReader reader = new FileReader(file)) {
-                JsonElement el = new JsonParser().parse(reader);
-                if (el.isJsonObject()) {
-                    return Optional.of(el.getAsJsonObject());
-                }
-            }
-        }
-        return Optional.absent();
-    }
+    Map<Integer, String> loadStateMap() throws IOException;
+
+    void initializeStateStore() throws IOException;
+
+    void saveStateSerial(int id, String serial) throws IOException;
+
+    void clearStateStore() throws IOException;
+
+    void logChange(int recordType, Location3D location, UUID uuid, String type, int data, String stateSerial)
+            throws IOException, SQLException;
+
+    void popRollbacks() throws IOException, SQLException;
+
+    void rollbackBlock(int id, Location3D location, String type, int data, String stateSerial)
+            throws IOException;
+
+    void rollbackEntityChange(int id, UUID uuid, Location3D location, String type, String stateSerial)
+            throws IOException;
+
+    void rollbackEntityCreation(int id, UUID uuid);
+
+    void cacheEntities();
 
 }
