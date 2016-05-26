@@ -27,9 +27,19 @@ import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.component.CommonComponent;
+import net.caseif.flint.common.util.file.CommonDataFiles;
+import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.lobby.LobbySign;
+import net.caseif.flint.lobby.type.ChallengerListingLobbySign;
+import net.caseif.flint.lobby.type.StatusLobbySign;
 import net.caseif.flint.util.physical.Location3D;
+
+import com.google.gson.JsonObject;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Implements {@link LobbySign}.
@@ -37,6 +47,12 @@ import net.caseif.flint.util.physical.Location3D;
  * @author Max Roncacé
  */
 public abstract class CommonLobbySign implements LobbySign, CommonComponent<Arena> {
+
+    public static final String PERSIST_TYPE_KEY = "type";
+    protected static final String PERSIST_TYPE_STATUS = "status";
+    protected static final String PERSIST_TYPE_LISTING = "listing";
+
+    public static final String PERSIST_INDEX_KEY = "index";
 
     private final Location3D location;
     private final CommonArena arena;
@@ -74,12 +90,69 @@ public abstract class CommonLobbySign implements LobbySign, CommonComponent<Aren
     /**
      * Stores this {@link LobbySign} to persistent storage.
      */
-    public abstract void store();
+    private void store(boolean remove) {
+        try {
+            File store = CommonDataFiles.LOBBY_STORE.getFile(getArena().getMinigame());
+            JsonObject json = JsonHelper.readOrCreateJson(store);
+
+            JsonObject arena = json.getAsJsonObject(getArena().getId());
+            if (arena == null) {
+                if (!remove) { // okay to create it since we're newly storing the sign
+                    arena = new JsonObject();
+                    json.add(getArena().getId(), arena);
+                } else { // can't delete something that's not there
+                    CommonCore.logWarning("Anomaly: Engine requested removal of lobby sign from store, but arena was "
+                            + "not defined");
+                    return;
+                }
+            }
+
+            String locSerial = getLocation().serialize();
+            if (remove) {
+                if (arena.has(locSerial)) {
+                    arena.remove(locSerial);
+                } else {
+                    CommonCore.logWarning("Engine requested removal of lobby sign from store, but respective section "
+                            + "was not defined");
+                }
+            } else {
+                JsonObject sign = new JsonObject();
+                arena.add(locSerial, sign);
+
+                String type;
+                if (this instanceof StatusLobbySign) {
+                    type = PERSIST_TYPE_STATUS;
+                } else if (this instanceof ChallengerListingLobbySign) {
+                    type = PERSIST_TYPE_LISTING;
+                } else {
+                    throw new AssertionError("Invalid LobbySign object. Report this immediately.");
+                }
+                sign.addProperty(PERSIST_TYPE_KEY, type);
+                if (this instanceof ChallengerListingLobbySign) {
+                    sign.addProperty(PERSIST_INDEX_KEY, ((ChallengerListingLobbySign) this).getIndex());
+                }
+            }
+
+            try (FileWriter writer = new FileWriter(store)) {
+                writer.write(json.toString());
+            }
+        } catch (IOException ex) {
+            CommonCore.logSevere("Failed to write to lobby sign store");
+            ex.printStackTrace();
+        }
+    }
+
+    public void store() {
+        store(false);
+    }
+
 
     /**
      * Removes this {@link LobbySign} from persistent storage.
      */
-    public abstract void unstore();
+    public void unstore() {
+        store(true);
+    }
 
     @Override
     public void checkState() throws OrphanedComponentException {

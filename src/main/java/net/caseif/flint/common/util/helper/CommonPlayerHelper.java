@@ -115,14 +115,7 @@ public class CommonPlayerHelper {
      */
     public static void storeLocation(UUID player, Location3D location) throws IOException {
         File store = CommonDataFiles.PLAYER_LOCATION_STORE.getFile();
-        JsonObject json;
-        if (store.exists()) {
-            try (FileReader reader = new FileReader(store)) {
-                json = new JsonParser().parse(reader).getAsJsonObject();
-            }
-        } else {
-            json = new JsonObject();
-        }
+        JsonObject json = JsonHelper.readOrCreateJson(store);
 
         json.add(player.toString(), serializeLocation(location));
 

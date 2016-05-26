@@ -24,12 +24,14 @@
 package net.caseif.flint.common.minigame;
 
 import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
+
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.common.util.file.CommonDataFiles;
+import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
@@ -43,10 +45,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -148,18 +148,14 @@ public abstract class CommonMinigame implements Minigame {
             return;
         }
 
-        JsonObject json;
         try {
-            try (FileReader reader = new FileReader(arenaStore)) {
-                JsonElement el = new JsonParser().parse(reader);
-                if (el.isJsonObject()) {
-                    json = el.getAsJsonObject(); // BIG-ASS TODO
-                } else {
-                    System.out.println(el);
-                    CommonCore.logWarning("Root of arena store is not object. Not reading arenas.");
-                    return;
-                }
+            Optional<JsonObject> jsonOpt;
+            jsonOpt = JsonHelper.readJson(arenaStore);
+            if (!jsonOpt.isPresent()) {
+                CommonCore.logWarning("Arena store does not exist or contains malformed data. Not reading.");
+                return;
             }
+            JsonObject json = jsonOpt.get();
 
             for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
                 if (json.get(entry.getKey()).isJsonObject()) {

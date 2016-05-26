@@ -45,7 +45,7 @@ public class CommonDataFiles {
     public static final CoreDataFile PLAYER_LOCATION_STORE = new CoreDataFile("locs.json");
 
     public static final MinigameDataFile ARENA_STORE = new MinigameDataFile("arenas.json");
-    public static final MinigameDataFile LOBBY_STORE = new MinigameDataFile("lobbies.yml");
+    public static final MinigameDataFile LOBBY_STORE = new MinigameDataFile("lobbies.json");
     public static final MinigameDataFile ROLLBACK_STORE = new MinigameDataFile("rollback.db");
     public static final MinigameDataFile ROLLBACK_STATE_STORE = new MinigameDataFile("rollback_state.json");
 

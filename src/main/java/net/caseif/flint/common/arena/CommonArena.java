@@ -27,6 +27,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
 import static net.caseif.flint.common.util.helper.JsonSerializer.serializeLocation;
+
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.component.CommonComponent;
@@ -36,6 +37,7 @@ import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.util.file.CommonDataFiles;
+import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.common.util.helper.JsonSerializer;
 import net.caseif.flint.common.util.helper.rollback.CommonRollbackHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
@@ -401,20 +403,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
     public void store() throws IOException {
         File arenaStore = CommonDataFiles.ARENA_STORE.getFile(getMinigame());
 
-        JsonObject json;
-        if (arenaStore.exists()) {
-            try (FileReader reader = new FileReader(arenaStore)) {
-                JsonElement el = new JsonParser().parse(reader);
-                if (el.isJsonObject()) {
-                    json = el.getAsJsonObject();
-                } else {
-                    json = new JsonObject();
-                }
-            }
-        } else {
-            Files.createFile(arenaStore.toPath());
-            json = new JsonObject();
-        }
+        JsonObject json = JsonHelper.readOrCreateJson(arenaStore);
 
         JsonObject jsonArena = new JsonObject();
         jsonArena.addProperty(PERSISTENCE_NAME_KEY, getName());
