@@ -33,6 +33,7 @@ import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.config.ConfigNode;
+import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
 import net.caseif.flint.util.physical.Boundary;
@@ -47,8 +48,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -193,6 +197,86 @@ public abstract class CommonMinigame implements Minigame {
             throw new RuntimeException("Failed to load existing arenas from disk", ex);
         }
     }
+
+    public void loadLobbySigns() {
+        try {
+            File store = CommonDataFiles.LOBBY_STORE.getFile(this);
+            Optional<JsonObject> jsonOpt = JsonHelper.readJson(store);
+            if (!jsonOpt.isPresent()) {
+                return;
+            }
+            JsonObject json = jsonOpt.get();
+
+            for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+                if (json.get(entry.getKey()).isJsonObject()) {
+                    Optional<Arena> arena = getArena(entry.getKey());
+                    if (arena.isPresent()) {
+                        JsonObject arenaJson = json.getAsJsonObject(entry.getKey());
+
+                        List<String> toRemove = new ArrayList<>();
+
+                        for (Map.Entry<String, JsonElement> arenaEntry : arenaJson.entrySet()) {
+                            if (arenaJson.get(arenaEntry.getKey()).isJsonObject()) {
+                                try {
+                                    Location3D loc = Location3D.deserialize(arenaEntry.getKey());
+                                    switch (checkPhysicalLobbySign(loc)) {
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            continue;
+                                        case 2:
+                                            toRemove.add(arenaEntry.getKey());
+                                            continue;
+                                        default: // wtf
+                                            throw new AssertionError("The platform implementation did something "
+                                                    + "super-wrong. Report this immediately.");
+                                    }
+                                    try {
+                                        LobbySign sign = CommonCore.getFactoryRegistry().getLobbySignFactory()
+                                        .createLobbySign(loc, (CommonArena) arena.get(),
+                                                arenaJson.getAsJsonObject(arenaEntry.getKey()));
+                                        ((CommonArena) arena.get()).getLobbySignMap().put(loc, sign);
+                                    } catch (IllegalArgumentException ex) {
+                                        CommonCore.logWarning("Found lobby sign in store with invalid "
+                                                + "configuration. Removing...");
+                                        json.remove(arenaEntry.getKey());
+                                    }
+                                } catch (IllegalArgumentException ignored) {
+                                    CommonCore.logWarning("Found lobby sign in store with invalid location serial. "
+                                            + "Removing...");
+                                }
+                            }
+                        }
+
+                        for (String key : toRemove) {
+                            arenaJson.remove(key);
+                        }
+                    } else {
+                        CommonCore.logVerbose("Found orphaned lobby sign group (arena \"" + entry.getKey()
+                                + "\") - not loading");
+                    }
+                }
+            }
+
+            try (FileWriter writer = new FileWriter(store)) {
+                writer.write(json.toString());
+            }
+        } catch (IOException ex) {
+            CommonCore.logSevere("Failed to load lobby signs for minigame " + getPlugin());
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * This is a weird method, hence why I'm documenting it. It accepts a
+     * {@link Location3D} as input and returns an {@code int} determining the
+     * action which should be taken on the lobby sign.
+     *
+     * @param loc The {@link Location3D} to consider
+     * @return {@code 0} if the sign should be loaded, {@code 1} if it should be
+     *     ignored, or {@code 2} if it should be removed from storage
+     */
+    protected abstract int checkPhysicalLobbySign(Location3D loc);
 
 
     @Override

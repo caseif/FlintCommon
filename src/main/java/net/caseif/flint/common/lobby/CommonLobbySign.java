@@ -49,8 +49,8 @@ import java.io.IOException;
 public abstract class CommonLobbySign implements LobbySign, CommonComponent<Arena> {
 
     public static final String PERSIST_TYPE_KEY = "type";
-    protected static final String PERSIST_TYPE_STATUS = "status";
-    protected static final String PERSIST_TYPE_LISTING = "listing";
+    public static final String PERSIST_TYPE_STATUS = "status";
+    public static final String PERSIST_TYPE_LISTING = "listing";
 
     public static final String PERSIST_INDEX_KEY = "index";
 

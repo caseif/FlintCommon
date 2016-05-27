@@ -31,6 +31,8 @@ public interface IFactoryRegistry {
 
     IRoundFactory getRoundFactory();
 
+    ILobbySignFactory getLobbySignFactory();
+
     IRollbackAgentFactory getRollbackAgentFactory();
 
 }
