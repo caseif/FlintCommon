@@ -233,7 +233,7 @@ public abstract class CommonMinigame implements Minigame {
                                     }
                                     try {
                                         LobbySign sign = CommonCore.getFactoryRegistry().getLobbySignFactory()
-                                        .createLobbySign(loc, (CommonArena) arena.get(),
+                                        .createLobbySign(loc, arena.get(),
                                                 arenaJson.getAsJsonObject(arenaEntry.getKey()));
                                         ((CommonArena) arena.get()).getLobbySignMap().put(loc, sign);
                                     } catch (IllegalArgumentException ex) {

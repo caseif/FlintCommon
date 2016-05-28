@@ -30,6 +30,7 @@ import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
+import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.lobby.type.ChallengerListingLobbySign;
 import net.caseif.flint.lobby.type.StatusLobbySign;
@@ -56,12 +57,14 @@ public abstract class CommonLobbySign implements LobbySign, CommonComponent<Aren
 
     private final Location3D location;
     private final CommonArena arena;
+    private final Type type;
 
     private boolean orphan = false;
 
-    protected CommonLobbySign(Location3D location, CommonArena arena) {
+    protected CommonLobbySign(Location3D location, CommonArena arena, Type type) {
         this.location = location;
         this.arena = arena;
+        this.type = type;
     }
 
     @Override
@@ -79,6 +82,11 @@ public abstract class CommonLobbySign implements LobbySign, CommonComponent<Aren
     public Location3D getLocation() throws OrphanedComponentException {
         checkState();
         return location;
+    }
+
+    @Override
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -153,6 +161,65 @@ public abstract class CommonLobbySign implements LobbySign, CommonComponent<Aren
     public void unstore() {
         store(true);
     }
+
+    protected String[] getChallengerListingText() {
+        if (!validate()) {
+            // hehe, illegal "state"
+            unregister();
+            CommonCore.logWarning("Cannot update lobby sign at (" + "\"" + location.getWorld() + "\", "
+                    + location.getX() + ", " + location.getY() + ", " + location.getZ() + "): not a sign. Removing...");
+        }
+        int startIndex = ((ChallengerListingLobbySign) this).getIndex() * getSignSize();
+        boolean round = getArena().getRound().isPresent();
+
+        String[] lines = new String[getSignSize()];
+        for (int i = 0; i < getSignSize(); i++) {
+            if (round && startIndex + i < getArena().getRound().get().getChallengers().size()) {
+                lines[i] = getArena().getRound().get().getChallengers().get(startIndex + i).getName();
+            } else {
+                lines[i] = "";
+            }
+        }
+
+        return lines;
+    }
+
+    protected String[] getStatusText() {
+        if (!validate()) {
+            unregister();
+            throw new IllegalStateException("Cannot update lobby sign: not a sign. Removing...");
+        }
+
+        String[] lines = new String[getSignSize()];
+
+        lines[0] = getArena().getDisplayName();
+        if (getArena().getRound().isPresent()) {
+            lines[1] = getArena().getRound().get().getLifecycleStage().getId().toUpperCase();
+            long seconds = getArena().getRound().get().getRemainingTime() != -1
+                    ? getArena().getRound().get().getRemainingTime()
+                    : getArena().getRound().get().getTime();
+            String time = seconds / 60 + ":" + (seconds % 60 >= 10 ? seconds % 60 : "0" + seconds % 60);
+            lines[2] = time;
+            // get max player count
+            int maxPlayers = getArena().getRound().get().getConfigValue(ConfigNode.MAX_PLAYERS);
+            // format player count relative to max
+            String players = getArena().getRound().get().getChallengers().size() + "/"
+                    + (maxPlayers > 0 ? maxPlayers : "∞");
+            // add label to player count (shortened version used if the full one won't fit)
+            players += players.length() <= 5 ? " players" : (players.length() <= 7 ? " plyrs" : "");
+            lines[3] = players;
+        } else {
+            for (int i = 1; i < getSignSize(); i++) {
+                lines[i] = "";
+            }
+        }
+
+        return lines;
+    }
+
+    protected abstract boolean validate();
+
+    protected abstract int getSignSize();
 
     @Override
     public void checkState() throws OrphanedComponentException {
