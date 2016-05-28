@@ -28,29 +28,29 @@ package net.caseif.flint.common.util.agent.chat;
 public class ChatCode {
 
     // color codes
-    public static final String BLACK = "\u00210";
-    public static final String BLUE = "\u00211";
-    public static final String GREEN = "\u00212";
-    public static final String TEAL = "\u00213";
-    public static final String RED = "\u00214";
-    public static final String PURPLE = "\u00215";
-    public static final String GOLD = "\u00216";
-    public static final String LIGHT_GRAY = "\u00217";
-    public static final String DARK_GRAY = "\u00218";
-    public static final String LIGHT_BLUE = "\u00219";
-    public static final String LIGHT_GREEN = "\u0021a";
-    public static final String AQUA = "\u0021b";
-    public static final String LIGHT_RED = "\u0021c";
-    public static final String PINK = "\u0021d";
-    public static final String YELLOW = "\u0021e";
-    public static final String WHITE = "\u0021f";
+    public static final String BLACK = "\u00A70";
+    public static final String BLUE = "\u00A71";
+    public static final String GREEN = "\u00A72";
+    public static final String TEAL = "\u00A73";
+    public static final String RED = "\u00A74";
+    public static final String PURPLE = "\u00A75";
+    public static final String GOLD = "\u00A76";
+    public static final String LIGHT_GRAY = "\u00A77";
+    public static final String DARK_GRAY = "\u00A78";
+    public static final String LIGHT_BLUE = "\u00A79";
+    public static final String LIGHT_GREEN = "\u00A7a";
+    public static final String AQUA = "\u00A7b";
+    public static final String LIGHT_RED = "\u00A7c";
+    public static final String PINK = "\u00A7d";
+    public static final String YELLOW = "\u00A7e";
+    public static final String WHITE = "\u00A7f";
 
     // formatting codes
-    public static final String OBFUSCATED = "\u0021k";
-    public static final String BOLD = "\u0021l";
-    public static final String STRIKETHROUGH = "\u0021m";
-    public static final String UNDERLINE = "\u0021n";
-    public static final String ITALIC = "\u0021o";
-    public static final String RESET = "\u0021r";
+    public static final String OBFUSCATED = "\u00A7k";
+    public static final String BOLD = "\u00A7l";
+    public static final String STRIKETHROUGH = "\u00A7m";
+    public static final String UNDERLINE = "\u00A7n";
+    public static final String ITALIC = "\u00A7o";
+    public static final String RESET = "\u00A7r";
 
 }
