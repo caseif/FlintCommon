@@ -323,7 +323,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         try {
             getRollbackAgent().popRollbacks();
         } catch (IOException | SQLException ex) {
-            throw new RuntimeException("Failed to rollback arena " + getName(), ex);
+            throw new RuntimeException("Failed to rollback arena " + getDisplayName(), ex);
         }
     }
 
@@ -420,7 +420,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         JsonObject json = JsonHelper.readOrCreateJson(arenaStore);
 
         JsonObject jsonArena = new JsonObject();
-        jsonArena.addProperty(PERSISTENCE_NAME_KEY, getName());
+        jsonArena.addProperty(PERSISTENCE_NAME_KEY, getDisplayName());
         jsonArena.addProperty(PERSISTENCE_WORLD_KEY, getWorld());
 
         JsonObject spawns = new JsonObject();
