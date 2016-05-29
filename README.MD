@@ -27,4 +27,4 @@ I can be contacted [via email at me@caseif.net](mailto:me@caseif.net).
 
 ### Copyright ###
 
-FlintCommon's source code and binary are provided under the BSD 3-Clause license.
+FlintCommon's source code and binary are provided under the MIT license.
