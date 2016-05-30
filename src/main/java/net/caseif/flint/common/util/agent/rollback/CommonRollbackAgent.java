@@ -109,13 +109,12 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
     @Override
     public void createRollbackDatabase() throws IOException, SQLException {
         if (!rollbackStore.exists()) {
-            rollbackStore.delete();
+            rollbackStore.createNewFile();
         }
-        rollbackStore.createNewFile();
         if (!stateStore.exists()) {
-            stateStore.delete();
+            stateStore.createNewFile();
         }
-        stateStore.createNewFile();
+
         try (Connection conn = DriverManager.getConnection(SQLITE_PROTOCOL + rollbackStore.getAbsolutePath())) {
             try (PreparedStatement st = conn.prepareStatement(SQL_QUERIES.getProperty("create-rollback-table")
                     .replace("{table}", getArena().getId()))

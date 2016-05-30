@@ -509,4 +509,13 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         this.orphan = true;
     }
 
+    /**
+     * Return whether this {@link SteelRound} object is orphaned.
+     *
+     * @return Whether this {@link SteelRound} object is orphaned
+     */
+    public boolean isOrphaned() {
+        return orphan;
+    }
+
 }
