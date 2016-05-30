@@ -133,8 +133,8 @@ public abstract class CommonMinigame implements Minigame {
         if (arena.getRound().isPresent()) {
             arena.getRound().get().end();
             CommonCore.logVerbose("Minigame " + getPlugin() + " requested to remove arena " + arena.getId()
-                    + " while it still contained a round. Steel will end it automatically, but typically this behavior "
-                    + "is not ideal and the round should be ended before the arena is requested for removal.");
+                    + " while it still contained a round. The engine will end it automatically, but typically this "
+                    + "behavior is not ideal and the round should be ended before the arena is requested for removal.");
         }
         getArenaMap().remove(arena.getId());
         try {
