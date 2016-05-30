@@ -51,12 +51,12 @@ public class CommonPlayerHelper {
             boolean isNew = false;
             if (!playerStore.exists()) {
                 playerStore.createNewFile();
-                isNew = true;
             }
 
             JsonArray json;
             try (FileReader reader = new FileReader(playerStore)) {
-                json = isNew ? new JsonArray() : (JsonArray) new JsonParser().parse(reader);
+                JsonElement el = new JsonParser().parse(reader);
+                json = el.isJsonArray() ? el.getAsJsonArray() : new JsonArray();
                 json.add(new JsonPrimitive(player.toString()));
             }
             try (FileWriter writer = new FileWriter(playerStore)) {
@@ -74,28 +74,36 @@ public class CommonPlayerHelper {
             if (!playerStore.exists()) {
                 return false;
             }
+
             JsonArray json;
             try (FileReader reader = new FileReader(playerStore)) {
-                json = new JsonParser().parse(reader).getAsJsonArray();
-            }
-            JsonArray newArray = new JsonArray();
-
-            Iterator<JsonElement> it = json.iterator();
-            boolean found = false;
-            while (it.hasNext()) {
-                JsonElement el = it.next();
-                if (el.getAsString().equals(player.toString())) {
-                    found = true;
-                } else {
-                    newArray.add(el);
+                JsonElement el = new JsonParser().parse(reader);
+                if (!el.isJsonArray()) {
+                    return false;
                 }
+                json = el.getAsJsonArray();
             }
 
-            if (found) {
-                try (FileWriter writer = new FileWriter(playerStore)) {
-                    writer.write(newArray.toString());
+            if (json.size() > 0) {
+                JsonArray newArray = new JsonArray();
+
+                Iterator<JsonElement> it = json.iterator();
+                boolean found = false;
+                while (it.hasNext()) {
+                    JsonElement el = it.next();
+                    if (el.getAsString().equals(player.toString())) {
+                        found = true;
+                    } else {
+                        newArray.add(el);
+                    }
                 }
-                return true;
+
+                if (found) {
+                    try (FileWriter writer = new FileWriter(playerStore)) {
+                        writer.write(newArray.toString());
+                    }
+                    return true;
+                }
             }
             return false;
         } catch (IOException ex) {
@@ -140,7 +148,11 @@ public class CommonPlayerHelper {
         JsonObject json;
         if (store.exists()) {
             try (FileReader reader = new FileReader(store)) {
-                json = new JsonParser().parse(reader).getAsJsonObject();
+                JsonElement el = new JsonParser().parse(reader);
+                if (!el.isJsonObject()) {
+                    return Optional.absent();
+                }
+                json = el.getAsJsonObject();
             }
         } else {
             return Optional.absent();
