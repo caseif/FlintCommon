@@ -182,6 +182,9 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         if (challenger.getRound() != this) {
             throw new IllegalArgumentException("Cannot remove challenger: round mismatch");
         }
+
+        ((CommonChallenger) challenger).setLeavingFlag();
+
         if (!challenger.getRound().isEnding()) {
             challengers.remove(challenger.getUniqueId());
             if (updateSigns) {
@@ -510,9 +513,9 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     /**
-     * Return whether this {@link SteelRound} object is orphaned.
+     * Return whether this {@link CommonRound} object is orphaned.
      *
-     * @return Whether this {@link SteelRound} object is orphaned
+     * @return Whether this {@link CommonRound} object is orphaned
      */
     public boolean isOrphaned() {
         return orphan;
