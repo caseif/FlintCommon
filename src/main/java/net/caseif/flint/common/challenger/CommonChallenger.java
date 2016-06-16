@@ -52,6 +52,8 @@ public abstract class CommonChallenger extends CommonMetadataHolder implements C
     private Team team;
     private boolean spectating = false;
 
+    private boolean leaving = false;
+
     protected CommonChallenger(UUID playerUuid, String playerName, CommonRound round) {
         assert playerUuid != null;
         assert playerName != null;
@@ -123,6 +125,14 @@ public abstract class CommonChallenger extends CommonMetadataHolder implements C
         if (this.spectating != spectating) {
             this.spectating = spectating;
         }
+    }
+
+    public boolean isLeaving() {
+        return leaving;
+    }
+
+    public void setLeavingFlag() {
+        leaving = true;
     }
 
     @Override
