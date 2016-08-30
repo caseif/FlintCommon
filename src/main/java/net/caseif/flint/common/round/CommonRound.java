@@ -58,8 +58,11 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -421,13 +424,13 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     @Override
     public void end() throws IllegalStateException, OrphanedComponentException {
         checkState();
-        end(getConfigValue(ConfigNode.ROLLBACK_ON_END));
+        end(new EndParameter[]{});
     }
 
     @Override
     public void end(boolean rollback) throws IllegalStateException, OrphanedComponentException {
         checkState();
-        end(rollback, false);
+        end(rollback ? EndParameter.RollbackBehavior.DO_ROLLBACK : EndParameter.RollbackBehavior.SKIP_ROLLBACK);
     }
 
     @Override
@@ -446,7 +449,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         }
     }
 
-    public void end(boolean rollback, boolean natural) throws IllegalStateException, OrphanedComponentException {
+    public void end(EndParameter... params) throws IllegalStateException, OrphanedComponentException {
         checkState();
         if (ending) {
             throw new IllegalStateException("Cannot invoke end() on a round more than once");
@@ -457,10 +460,13 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         for (Challenger challenger : getChallengers()) {
             removeChallenger(challenger, false, false);
         }
-        if (rollback) {
+        List<EndParameter> paramList = Arrays.asList(params);
+        if (getConfigValue(ConfigNode.ROLLBACK_ON_END)
+                || paramList.contains(EndParameter.RollbackBehavior.DO_ROLLBACK)) {
             getArena().rollback();
         }
-        getArena().getMinigame().getEventBus().post(new CommonRoundEndEvent(this, natural));
+        getArena().getMinigame().getEventBus()
+                .post(new CommonRoundEndEvent(this, paramList.contains(NaturalEnd.NATURAL)));
         for (Challenger challenger : getChallengers()) {
             ((CommonChallenger) challenger).orphan();
         }
@@ -519,6 +525,10 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
      */
     public boolean isOrphaned() {
         return orphan;
+    }
+
+    public static class NaturalEnd implements EndParameter {
+        public static final NaturalEnd NATURAL = new NaturalEnd();
     }
 
 }

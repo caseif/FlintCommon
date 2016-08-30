@@ -68,7 +68,7 @@ public abstract class CommonRoundWorker implements Runnable {
             if (round.getNextLifecycleStage().isPresent()) {
                 round.nextLifecycleStage();
             } else {
-                round.end(round.getConfigValue(ConfigNode.ROLLBACK_ON_END), true);
+                round.end(CommonRound.NaturalEnd.NATURAL);
                 return;
             }
         } else {
