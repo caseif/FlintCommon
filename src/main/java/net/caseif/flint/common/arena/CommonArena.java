@@ -100,19 +100,32 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
 
     private boolean orphan = false;
 
-    protected CommonArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary)
+    protected CommonArena(CommonMinigame parent, String id, String name, Location3D[] spawnPoints, Boundary boundary)
             throws IllegalArgumentException {
         assert parent != null;
         assert id != null;
         assert name != null;
-        checkNotNull(initialSpawn, "Initial spawn for arena \"" + id + "\" must not be null");
-        checkArgument(initialSpawn.getWorld().isPresent(),
-                "Initial spawn for arena \"" + id + "\" must have world");
-        checkArgument(boundary.contains(initialSpawn), "Spawn point must be within arena boundary");
+        checkArgument(spawnPoints != null && spawnPoints.length > 0,
+                "Initial spawn for arena \"" + id + "\" must not be null or empty");
+        String world = null;
+        for (Location3D spawn : spawnPoints) {
+            if (spawn.getWorld().isPresent()) {
+                if (world != null) {
+                    checkArgument(spawn.getWorld().get().equals(world), "Spawn points must not have different worlds");
+                } else {
+                    world = spawn.getWorld().get();
+                }
+            }
+        }
+        checkArgument(spawnPoints[0].getWorld().isPresent(),
+                "At least one spawn point for arena \"" + id + "\" must define a world");
+        for (Location3D spawn : spawnPoints) {
+            checkArgument(boundary.contains(spawn), "Spawn points must be within arena boundary");
+        }
 
         if (!boundary.getLowerBound().getWorld().isPresent() && !boundary.getUpperBound().getWorld().isPresent()) {
             Location3D newLower = new Location3D(
-                    initialSpawn.getWorld().get(),
+                    world,
                     boundary.getLowerBound().getX(),
                     boundary.getLowerBound().getY(),
                     boundary.getLowerBound().getZ()
@@ -123,9 +136,12 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         this.parent = parent;
         this.id = id;
         this.name = name;
-        this.world = initialSpawn.getWorld().get();
-        this.spawns.put(0, initialSpawn);
-        this.shuffledSpawns = Lists.newArrayList(initialSpawn);
+        this.world = world;
+        for (int i = 0; i < spawnPoints.length; i++) {
+            this.spawns.put(i, spawnPoints[i]);
+        }
+        this.shuffledSpawns = Lists.newArrayList(spawnPoints);
+        Collections.shuffle(this.shuffledSpawns);
         this.boundary = boundary;
 
         this.rbHelper = CommonCore.getFactoryRegistry().getRollbackAgentFactory().createRollbackAgent(this);
