@@ -188,7 +188,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
 
         ((CommonChallenger) challenger).setLeavingFlag();
 
-        if (!challenger.getRound().isEnding()) {
+        if (!this.isEnding()) {
             challengers.remove(challenger.getUniqueId());
             if (updateSigns) {
                 for (LobbySign sign : getArena().getLobbySigns()) {
@@ -456,18 +456,20 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         }
         ending = true;
         cancelTimerTask();
-        ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
             removeChallenger(challenger, false, false);
         }
+
         List<EndParameter> paramList = Arrays.asList(params);
         if (getConfigValue(ConfigNode.ROLLBACK_ON_END)
                 || paramList.contains(EndParameter.RollbackBehavior.DO_ROLLBACK)) {
             getArena().rollback();
         }
+
         getArena().getMinigame().getEventBus()
                 .post(new CommonRoundEndEvent(this, paramList.contains(NaturalEnd.NATURAL)));
+
         for (Challenger challenger : getChallengers()) {
             ((CommonChallenger) challenger).orphan();
         }
@@ -475,6 +477,8 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         for (LobbySign ls : getArena().getLobbySigns()) {
             ls.update();
         }
+
+        ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
         this.orphan();
     }
 
