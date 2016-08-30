@@ -55,6 +55,9 @@ public abstract class CommonCore extends FlintCore {
     public static PlatformUtils PLATFORM_UTILS;
 
     static {
+    }
+
+    protected static void initializeCommon() {
         BuilderRegistry.instance().registerBuilder(Arena.class, CommonArena.Builder.class);
     }
 

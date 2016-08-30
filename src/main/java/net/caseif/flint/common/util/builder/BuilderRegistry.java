@@ -25,12 +25,14 @@ package net.caseif.flint.common.util.builder;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.util.builder.Buildable;
 import net.caseif.flint.util.builder.Builder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,12 +51,17 @@ public class BuilderRegistry {
                                                                                                  Class<U> builder) {
         checkState(!ctorMap.containsKey(target),
                 "Builder for class " + target.getName() + " has already been registered");
+        if (!Modifier.isStatic(builder.getModifiers())) {
+            CommonCore.logSevere("Cannot register non-static class " + builder.getName() + " as Builder");
+            return;
+        }
         try {
             Constructor<U> ctor = builder.getConstructor(Minigame.class);
             ctorMap.put(target, ctor);
         } catch (NoSuchMethodException ex) {
-            throw new RuntimeException("Failed to find applicable constructor for Builder class " + builder.getName()
-                    + " - skipping registration", ex);
+            CommonCore.logSevere("Failed to find applicable constructor for Builder class " + builder.getName()
+                    + " - skipping registration");
+            ex.printStackTrace();
         }
     }
 

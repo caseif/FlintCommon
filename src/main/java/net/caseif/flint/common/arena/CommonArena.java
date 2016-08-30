@@ -490,7 +490,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         }
     }
 
-    public class Builder implements Arena.Builder {
+    public static class Builder implements Arena.Builder {
 
         private final Minigame mg;
         private String id;
