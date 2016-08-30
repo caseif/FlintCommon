@@ -30,6 +30,6 @@ import net.caseif.flint.util.physical.Location3D;
 
 public interface IArenaFactory {
 
-    CommonArena createArena(CommonMinigame parent, String id, String name, Location3D initialSpawn, Boundary boundary);
+    CommonArena createArena(CommonMinigame parent, String id, String name, Location3D[] spawnPoints, Boundary boundary);
 
 }

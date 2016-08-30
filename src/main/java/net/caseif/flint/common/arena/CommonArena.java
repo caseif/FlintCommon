@@ -474,4 +474,52 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         }
     }
 
+    public class Builder implements Arena.Builder {
+
+        private final Minigame mg;
+        private String id;
+        private String dispName;
+        private Location3D[] spawnPoints;
+        private Boundary boundary;
+
+        public Builder(Minigame mg) {
+            this.mg = mg;
+        }
+
+        @Override
+        public Arena.Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        @Override
+        public Arena.Builder displayName(String displayName) {
+            this.dispName = displayName;
+            return this;
+        }
+
+        @Override
+        public Arena.Builder spawnPoints(Location3D... spawnPoints) {
+            this.spawnPoints = spawnPoints;
+            return this;
+        }
+
+        @Override
+        public Arena.Builder boundary(Boundary boundary) {
+            this.boundary = boundary;
+            return this;
+        }
+
+        @Override
+        public Arena build() throws IllegalStateException {
+            Preconditions.checkState(id != null, "ID must be set before building");
+            Preconditions.checkState(spawnPoints != null && spawnPoints.length > 0,
+                    "Spawn points must be set before building");
+            Preconditions.checkState(boundary != null, "Boundary must be set before building");
+            return CommonCore.getFactoryRegistry().getArenaFactory().createArena((CommonMinigame) mg, id,
+                    dispName != null ? dispName : id, spawnPoints, boundary);
+        }
+
+    }
+
 }

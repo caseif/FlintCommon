@@ -24,10 +24,13 @@
 package net.caseif.flint.common;
 
 import net.caseif.flint.FlintCore;
+import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
+import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.common.util.agent.chat.IChatAgent;
+import net.caseif.flint.common.util.builder.BuilderRegistry;
 import net.caseif.flint.common.util.factory.IFactoryRegistry;
 import net.caseif.flint.minigame.Minigame;
 
@@ -50,6 +53,10 @@ public abstract class CommonCore extends FlintCore {
      * The singleton {@link PlatformUtils} instance.
      */
     public static PlatformUtils PLATFORM_UTILS;
+
+    static {
+        BuilderRegistry.instance().registerBuilder(Arena.class, CommonArena.Builder.class);
+    }
 
     @Override
     protected Minigame registerPlugin0(String pluginId) throws IllegalStateException {

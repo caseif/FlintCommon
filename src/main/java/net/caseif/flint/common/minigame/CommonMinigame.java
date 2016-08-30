@@ -30,12 +30,15 @@ import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
+import net.caseif.flint.common.util.builder.BuilderRegistry;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.config.ConfigNode;
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.minigame.Minigame;
 import net.caseif.flint.round.Round;
+import net.caseif.flint.util.builder.Buildable;
+import net.caseif.flint.util.builder.Builder;
 import net.caseif.flint.util.physical.Boundary;
 import net.caseif.flint.util.physical.Location3D;
 
@@ -176,12 +179,10 @@ public abstract class CommonMinigame implements Minigame {
                                 this,
                                 entry.getKey().toLowerCase(),
                                 arenaJson.get(CommonArena.PERSISTENCE_NAME_KEY).getAsString(),
-                                new Location3D(arenaJson.get(CommonArena.PERSISTENCE_WORLD_KEY).getAsString(),
-                                        lowerBound.getX(), lowerBound.getY(), lowerBound.getZ()),
-                                new Boundary(
-                                        upperBound,
-                                        lowerBound
-                                )
+                                new Location3D[] {new Location3D(
+                                        arenaJson.get(CommonArena.PERSISTENCE_WORLD_KEY).getAsString(),
+                                        lowerBound.getX(), lowerBound.getY(), lowerBound.getZ())},
+                                new Boundary(upperBound, lowerBound)
                         );
                         arena.getSpawnPointMap().remove(0); // remove initial placeholder spawn
                         arena.configure(arenaJson);
@@ -301,6 +302,11 @@ public abstract class CommonMinigame implements Minigame {
             }
         }
         return Optional.absent();
+    }
+
+    @Override
+    public <T extends Buildable<U>, U extends Builder<T>> U createBuilder(Class<T> type) {
+        return BuilderRegistry.instance().createBuilder(type, this);
     }
 
     // everything below this line is (are?) internal utility methods
