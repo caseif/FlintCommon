@@ -455,6 +455,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
             throw new IllegalStateException("Cannot invoke end() on a round more than once");
         }
         ending = true;
+        cancelTimerTask();
         ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
 
         for (Challenger challenger : getChallengers()) {
@@ -470,6 +471,11 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
         for (Challenger challenger : getChallengers()) {
             ((CommonChallenger) challenger).orphan();
         }
+
+        for (LobbySign ls : getArena().getLobbySigns()) {
+            ls.update();
+        }
+        this.orphan();
     }
 
     @Override
@@ -507,6 +513,8 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
             throw new OrphanedComponentException(this);
         }
     }
+
+    protected abstract void cancelTimerTask();
 
     @Override
     public void orphan() {
