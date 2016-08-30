@@ -25,11 +25,16 @@ package net.caseif.flint.common.metadata;
 
 import net.caseif.flint.metadata.Metadata;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,8 +53,18 @@ public class CommonMetadata implements Metadata {
     }
 
     @Override
+    public boolean containsKey(String key) {
+        return data.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return data.containsValue(value);
+    }
+
+    @Override
     public boolean has(String key) {
-        return get(key).isPresent();
+        return containsKey(key);
     }
 
     @Override
@@ -83,10 +98,34 @@ public class CommonMetadata implements Metadata {
     }
 
     @Override
+    public ImmutableSet<String> keySet() {
+        return ImmutableSet.copyOf(data.keySet());
+    }
+
+    @Override
+    public ImmutableCollection<?> values() {
+        return ImmutableList.copyOf(data.values());
+    }
+
+    // this is horrible
+    @Override
+    public ImmutableSet<? extends Map.Entry<String, ?>> entrySet() {
+        return ImmutableSet.copyOf(Collections2.transform(data.entrySet(),
+                new Function<Map.Entry<String, ?>, AbstractMap.SimpleImmutableEntry<String, ?>>() {
+                    @Override
+                    public AbstractMap.SimpleImmutableEntry<String, ?> apply(Map.Entry<String, ?> input) {
+                        return new AbstractMap.SimpleImmutableEntry<String, Object>(input);
+                    }
+                }
+        ));
+    }
+
+    @Override
     public void clear() {
         data.clear();
     }
 
+    // strictly for metadata mutation events
     public static EventBus getEventBus() {
         return EVENT_BUS;
     }

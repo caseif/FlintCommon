@@ -15,7 +15,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'checkstyle'
-    id 'com.github.johnrengelman.shadow' version '1.2.0'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
     id 'blue.lapis.methodremapper' version '0.1.3'
 }
 

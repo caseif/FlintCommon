@@ -25,6 +25,7 @@ package net.caseif.flint.common.metadata.persist;
 
 import net.caseif.flint.common.event.internal.metadata.PersistableMetadataMutateEvent;
 import net.caseif.flint.common.metadata.CommonMetadata;
+import net.caseif.flint.common.serialization.SimpleMetadataSerializer;
 import net.caseif.flint.metadata.persist.PersistentMetadata;
 import net.caseif.flint.serialization.Serializer;
 
@@ -32,9 +33,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implements {@link PersistentMetadata}.
@@ -54,36 +60,16 @@ public class CommonPersistentMetadata extends CommonMetadata implements Persiste
      * Furthermore, the internal character representation is also part of the
      * respective assigned prefixes.
      */
-    private static final String PRIMITIVE_PREFIX = "PRIM_";
+    public static final String PRIMITIVE_PREFIX = "PRIM_";
+
+    private static final SimpleMetadataSerializer SIMPLE_SERIALIZER = new SimpleMetadataSerializer<>();
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> get(String key) throws ClassCastException {
         Optional<Object> value = super.get(key);
         if (value.isPresent() && value.get() instanceof String) {
-            String str = (String)value.get();
-            if (str.startsWith(PRIMITIVE_PREFIX)) {
-                switch (str.charAt(PRIMITIVE_PREFIX.length())) {
-                    case 'Z':
-                        return Optional.of((T)Boolean.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'B':
-                        return Optional.of((T)Byte.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'S':
-                        return Optional.of((T)Short.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'C':
-                        return Optional.of((T)Character.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)
-                                .charAt(0)));
-                    case 'I':
-                        return Optional.of((T)Integer.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'J':
-                        return Optional.of((T)Long.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'F':
-                        return Optional.of((T)Float.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    case 'D':
-                        return Optional.of((T)Double.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2)));
-                    default: // continue to end
-                }
-            }
+            return Optional.of(new SimpleMetadataSerializer<T>().deserialize(value.toString()));
         }
         return (Optional<T>)value;
     }
@@ -108,42 +94,42 @@ public class CommonPersistentMetadata extends CommonMetadata implements Persiste
 
     @Override
     public void set(String key, boolean value) {
-        set(key, PRIMITIVE_PREFIX + "Z_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, byte value) {
-        set(key, PRIMITIVE_PREFIX + "B_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, short value) {
-        set(key, PRIMITIVE_PREFIX + "S_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, char value) {
-        set(key, PRIMITIVE_PREFIX + "C_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, int value) {
-        set(key, PRIMITIVE_PREFIX + "I_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, long value) {
-        set(key, PRIMITIVE_PREFIX + "J_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, float value) {
-        set(key, PRIMITIVE_PREFIX + "F_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
     public void set(String key, double value) {
-        set(key, PRIMITIVE_PREFIX + "D_" + value);
+        set(key, SIMPLE_SERIALIZER);
     }
 
     @Override
@@ -175,6 +161,55 @@ public class CommonPersistentMetadata extends CommonMetadata implements Persiste
         data.put(key, structure);
         postEvent();
         return structure;
+    }
+
+    @Override
+    public ImmutableCollection<String> values() {
+        return ImmutableList.copyOf(Collections2.transform(data.values(), new Function<Object, String>() {
+            @Override
+            public String apply(Object input) {
+                return (String) input;
+            }
+        }));
+    }
+
+    @Override
+    public ImmutableCollection<Object> values(final Function<String, Object> transformer) {
+        return ImmutableList.copyOf(Collections2.transform(data.values(), new Function<Object, Object>() {
+            @Override
+            public Object apply(Object input) {
+                return transformer.apply((String) input);
+            }
+        }));
+    }
+
+    @Override
+    public ImmutableSet<? extends Map.Entry<String, String>> entrySet() {
+        return ImmutableSet.copyOf(Collections2.transform(data.entrySet(),
+                new Function<Map.Entry<String, ?>, AbstractMap.SimpleImmutableEntry<String, String>>() {
+                    @Override
+                    public AbstractMap.SimpleImmutableEntry<String, String> apply(Map.Entry<String, ?> input) {
+                        return new AbstractMap.SimpleImmutableEntry<>(input.getKey(), (String) input.getValue());
+                    }
+                }
+        ));
+    }
+
+    // this is even more disgusting than the one in CommonMetadata
+    @Override
+    public ImmutableSet<? extends Map.Entry<String, Object>> entrySet(final Function<String, Object> transformer) {
+        return ImmutableSet.copyOf(Collections2.transform(data.entrySet(),
+                new Function<Map.Entry<String, Object>, AbstractMap.SimpleImmutableEntry<String, Object>>() {
+                    @Override
+                    public AbstractMap.SimpleImmutableEntry<String, Object> apply(Map.Entry<String, Object> input) {
+                        Object attempt = SIMPLE_SERIALIZER.deserialize(input.getValue().toString());
+                        if (attempt instanceof String) {
+                            attempt = transformer.apply((String) attempt);
+                        }
+                        return new AbstractMap.SimpleImmutableEntry<>(input.getKey(), attempt);
+                    }
+                }
+        ));
     }
 
     @Override
