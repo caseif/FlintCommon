@@ -23,6 +23,8 @@
  */
 package net.caseif.flint.common.lobby;
 
+import static javafx.scene.input.KeyCode.R;
+
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
@@ -31,7 +33,9 @@ import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.component.exception.OrphanedComponentException;
 import net.caseif.flint.config.ConfigNode;
+import net.caseif.flint.config.RoundConfigNode;
 import net.caseif.flint.lobby.LobbySign;
+import net.caseif.flint.lobby.populator.LobbySignPopulator;
 import net.caseif.flint.lobby.type.ChallengerListingLobbySign;
 import net.caseif.flint.lobby.type.StatusLobbySign;
 import net.caseif.flint.util.physical.Location3D;
@@ -94,6 +98,26 @@ public abstract class CommonLobbySign implements LobbySign, CommonComponent<Aren
         checkState();
         arena.unregisterLobbySign(location);
     }
+
+    @Override
+    public void update() {
+        checkState();
+
+        RoundConfigNode<LobbySignPopulator> node;
+        if (getType() == Type.STATUS) {
+            node = ConfigNode.STATUS_LOBBY_SIGN_POPULATOR;
+        } else if (getType() == Type.CHALLENGER_LISTING) {
+            node = ConfigNode.CHALLENGER_LISTING_LOBBY_SIGN_POPULATOR;
+        } else {
+            throw new AssertionError();
+        }
+        LobbySignPopulator pop = getArena().getRound().isPresent()
+                ? getArena().getRound().get().getConfigValue(node)
+                : getArena().getMinigame().getConfigValue(node);
+        updatePhysicalSign(pop.first(this), pop.second(this), pop.third(this), pop.fourth(this));
+    }
+
+    protected abstract void updatePhysicalSign(String... lines);
 
     /**
      * Stores this {@link LobbySign} to persistent storage.
