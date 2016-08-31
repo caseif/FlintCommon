@@ -184,14 +184,14 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
             switch (recordType) {
                 case RECORD_TYPE_BLOCK_CHANGED:
                     querySql = SQL_QUERIES.getProperty("query-by-location")
-                            .replace("{world}", "\"" + world + "\"")
+                            .replace("{world}", world)
                             .replace("{x}", "" + location.getX())
                             .replace("{y}", "" + location.getY())
                             .replace("{z}", "" + location.getZ());
                     break;
                 case RECORD_TYPE_ENTITY_CHANGED:
                     querySql = SQL_QUERIES.getProperty("query-by-uuid")
-                            .replace("{uuid}", "\"" + uuid.toString() + "\"");
+                            .replace("{uuid}", uuid.toString());
                     break;
                 default:
                     querySql = null;
