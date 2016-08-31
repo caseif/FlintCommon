@@ -47,13 +47,13 @@ public interface IRollbackAgent {
 
     void popRollbacks() throws IOException, SQLException;
 
-    void rollbackBlock(int id, Location3D location, String type, int data, String stateSerial)
+    void rollbackBlock(RollbackRecord record)
             throws IOException;
 
-    void rollbackEntityChange(int id, UUID uuid, Location3D location, String type, String stateSerial)
+    void rollbackEntityChange(RollbackRecord record)
             throws IOException;
 
-    void rollbackEntityCreation(int id, UUID uuid);
+    void rollbackEntityCreation(RollbackRecord record);
 
     void cacheEntities();
 

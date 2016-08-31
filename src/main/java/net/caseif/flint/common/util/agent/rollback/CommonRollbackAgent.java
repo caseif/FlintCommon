@@ -298,13 +298,15 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
 
                             switch (recordType) {
                                 case BLOCK_CHANGE:
-                                    rollbackBlock(id, new Location3D(world, x, y, z), type, data, stateSerial);
+                                    rollbackBlock(RollbackRecord.createBlockRecord(id, new Location3D(world, x, y, z),
+                                            type, data, stateSerial));
                                     break;
                                 case ENTITY_CREATION:
-                                    rollbackEntityCreation(id, uuid);
+                                    rollbackEntityCreation(RollbackRecord.createEntityCreationRecord(id, uuid));
                                     break;
                                 case ENTITY_CHANGE:
-                                    rollbackEntityChange(id, uuid, new Location3D(world, x, y, z), type, stateSerial);
+                                    rollbackEntityChange(RollbackRecord.createEntityChangeRecord(id, uuid,
+                                            new Location3D(world, x, y, z), type, stateSerial));
                                     break;
                                 default:
                                     CommonCore.logWarning("Invalid rollback record type at ID " + id);
