@@ -26,6 +26,7 @@ package net.caseif.flint.common.lobby.populator;
 
 import net.caseif.flint.lobby.LobbySign;
 import net.caseif.flint.lobby.populator.LobbySignPopulator;
+import net.caseif.flint.minigame.Minigame;
 
 import com.google.common.base.Function;
 
@@ -77,6 +78,10 @@ public class FunctionalLobbySignPopulator implements LobbySignPopulator {
         private Function<LobbySign, String> second;
         private Function<LobbySign, String> third;
         private Function<LobbySign, String> fourth;
+
+        public Builder(Minigame mg) {
+            // noop
+        }
 
         @Override
         public LobbySignPopulator.Builder first(Function<LobbySign, String> function) {
