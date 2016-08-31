@@ -50,9 +50,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 
 public abstract class CommonRollbackAgent implements IRollbackAgent {
@@ -263,6 +265,10 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
     @Override
     @SuppressWarnings("deprecation")
     public void popRollbacks() throws IOException, SQLException {
+        final Set<RollbackRecord> blockChangeRecords = new HashSet<>();
+        final Set<RollbackRecord> entityCreateRecords = new HashSet<>();
+        final Set<RollbackRecord> entityChangeRecords = new HashSet<>();
+
         if (rollbackStore.exists()) {
             Map<Integer, String> stateMap = loadStateMap();
 
@@ -298,14 +304,14 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
 
                             switch (recordType) {
                                 case BLOCK_CHANGE:
-                                    rollbackBlock(RollbackRecord.createBlockRecord(id, new Location3D(world, x, y, z),
+                                    blockChangeRecords.add(RollbackRecord.createBlockRecord(id, new Location3D(world, x, y, z),
                                             type, data, stateSerial));
                                     break;
                                 case ENTITY_CREATION:
-                                    rollbackEntityCreation(RollbackRecord.createEntityCreationRecord(id, uuid, world));
+                                    entityCreateRecords.add(RollbackRecord.createEntityCreationRecord(id, uuid, world));
                                     break;
                                 case ENTITY_CHANGE:
-                                    rollbackEntityChange(RollbackRecord.createEntityChangeRecord(id, uuid,
+                                    entityChangeRecords.add(RollbackRecord.createEntityChangeRecord(id, uuid,
                                             new Location3D(world, x, y, z), type, stateSerial));
                                     break;
                                 default:
@@ -320,6 +326,31 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                         ex.printStackTrace();
                     }
                 }
+
+                for (RollbackRecord record : blockChangeRecords) {
+                    assert record.getType() == RollbackRecord.Type.BLOCK_CHANGE;
+                    rollbackBlock(record);
+                }
+                for (RollbackRecord record : entityCreateRecords) {
+                    assert record.getType() == RollbackRecord.Type.BLOCK_CHANGE;
+                    rollbackEntityCreation(record);
+                }
+                // entity change rollbacks need to be delayed by one tick to avoid conflict with block changes or any
+                // entities which might have been created in the same location
+                delay(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            for (RollbackRecord record : entityChangeRecords) {
+                                assert record.getType() == RollbackRecord.Type.BLOCK_CHANGE;
+                                rollbackEntityChange(record);
+                            }
+                        } catch (IOException ex) {
+                            //
+                        }
+                    }
+                });
+
                 drop.executeUpdate();
             }
             clearStateStore();
@@ -391,5 +422,7 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
         }
         return arenas;
     }
+
+    protected abstract void delay(Runnable runnable);
 
 }
