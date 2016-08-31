@@ -35,11 +35,12 @@ public abstract class CommonUnsafeUtil extends UnsafeUtil {
     protected static void testInternalUse() {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         for (int i = 1; i < stack.length; i++) {
-            if (!UNSAFE_PACKAGE_PATTERN.matcher(stack[i].getClassName()).find()
-                    && FLINT_PACKAGE_PATTERN.matcher(stack[i].getClassName()).find()) {
-                break;
-            } else {
-                throw new IllegalStateException("UnsafeUtil may not be used externally");
+            if (!UNSAFE_PACKAGE_PATTERN.matcher(stack[i].getClassName()).find()) {
+                if (FLINT_PACKAGE_PATTERN.matcher(stack[i].getClassName()).find()) {
+                    break;
+                } else {
+                    throw new IllegalStateException("UnsafeUtil may not be used externally");
+                }
             }
         }
     }

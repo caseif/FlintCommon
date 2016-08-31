@@ -58,7 +58,7 @@ public class StockChallengerListingLobbySignPopulator implements LobbySignPopula
     }
 
     public String getPlayer(LobbySign sign, int lineIndex) {
-        int startIndex = ((ChallengerListingLobbySign) this).getIndex() * SIGN_SIZE;
+        int startIndex = ((ChallengerListingLobbySign) sign).getIndex() * SIGN_SIZE;
         if (sign.getArena().getRound().isPresent()
                 && startIndex + lineIndex < sign.getArena().getRound().get().getChallengers().size()) {
             return sign.getArena().getRound().get().getChallengers().get(startIndex + lineIndex).getName();
