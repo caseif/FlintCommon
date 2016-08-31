@@ -302,7 +302,7 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                                             type, data, stateSerial));
                                     break;
                                 case ENTITY_CREATION:
-                                    rollbackEntityCreation(RollbackRecord.createEntityCreationRecord(id, uuid));
+                                    rollbackEntityCreation(RollbackRecord.createEntityCreationRecord(id, uuid, world));
                                     break;
                                 case ENTITY_CHANGE:
                                     rollbackEntityChange(RollbackRecord.createEntityChangeRecord(id, uuid,

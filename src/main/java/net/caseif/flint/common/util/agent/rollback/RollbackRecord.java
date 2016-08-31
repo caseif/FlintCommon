@@ -56,8 +56,8 @@ public class RollbackRecord {
         return new RollbackRecord(id, null, loc, type, data, stateSerial, Type.BLOCK_CHANGE);
     }
 
-    public static RollbackRecord createEntityCreationRecord(int id, UUID uuid) {
-        return new RollbackRecord(id, uuid, null, null, 0, null, Type.ENTITY_CREATION);
+    public static RollbackRecord createEntityCreationRecord(int id, UUID uuid, String world) {
+        return new RollbackRecord(id, uuid, new Location3D(world, 0, 0, 0), null, 0, null, Type.ENTITY_CREATION);
     }
 
     public static RollbackRecord createEntityChangeRecord(int id, UUID uuid, Location3D loc, String type,
