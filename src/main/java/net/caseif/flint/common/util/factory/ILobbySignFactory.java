@@ -30,7 +30,7 @@ import net.caseif.flint.util.physical.Location3D;
 
 import com.google.gson.JsonObject;
 
-public interface ILobbySignFactory {
+public interface ILobbySignFactory extends Factory<LobbySign> {
 
     LobbySign createLobbySign(Location3D location, Arena arena, JsonObject json) throws IllegalArgumentException;
 

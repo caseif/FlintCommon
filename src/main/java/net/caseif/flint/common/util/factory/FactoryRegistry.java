@@ -24,14 +24,36 @@
 
 package net.caseif.flint.common.util.factory;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import net.caseif.flint.arena.Arena;
-import net.caseif.flint.common.arena.CommonArena;
-import net.caseif.flint.common.minigame.CommonMinigame;
-import net.caseif.flint.util.physical.Boundary;
-import net.caseif.flint.util.physical.Location3D;
+import net.caseif.flint.common.CommonCore;
+import net.caseif.flint.minigame.Minigame;
+import net.caseif.flint.util.builder.Buildable;
+import net.caseif.flint.util.builder.Builder;
 
-public interface IArenaFactory extends Factory<Arena> {
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
-    CommonArena createArena(CommonMinigame parent, String id, String name, Location3D[] spawnPoints, Boundary boundary);
+public class FactoryRegistry {
+
+    private static final Map<Class<?>, Factory<?>> factoryMap = new HashMap<>();
+
+    public static <T, F extends Factory<? extends T>> void registerFactory(Class<T> target,
+                                                                    F factory) {
+        checkState(!factoryMap.containsKey(target),
+                "Builder for class " + target.getName() + " has already been registered");
+        factoryMap.put(target, factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T, F extends Factory<T>> F getFactory(Class<T> clazz)
+            throws IllegalStateException {
+        checkState(factoryMap.containsKey(clazz), "No Factory registration available for class " + clazz.getName());
+        return (F) factoryMap.get(clazz);
+    }
 
 }

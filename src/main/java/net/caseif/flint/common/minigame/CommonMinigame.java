@@ -33,6 +33,9 @@ import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.event.FlintSubscriberExceptionHandler;
 import net.caseif.flint.common.util.builder.BuilderRegistry;
+import net.caseif.flint.common.util.factory.FactoryRegistry;
+import net.caseif.flint.common.util.factory.IArenaFactory;
+import net.caseif.flint.common.util.factory.ILobbySignFactory;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.config.ConfigNode;
@@ -179,7 +182,7 @@ public abstract class CommonMinigame implements Minigame {
                         Location3D lowerBound = deserializeLocation(
                                 arenaJson.getAsJsonObject(CommonArena.PERSISTENCE_BOUNDS_LOWER_KEY)
                         );
-                        CommonArena arena = CommonCore.getFactoryRegistry().getArenaFactory().createArena(
+                        CommonArena arena = ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena(
                                 this,
                                 entry.getKey().toLowerCase(),
                                 arenaJson.get(CommonArena.PERSISTENCE_NAME_KEY).getAsString(),
@@ -237,9 +240,10 @@ public abstract class CommonMinigame implements Minigame {
                                                     + "super-wrong. Report this immediately.");
                                     }
                                     try {
-                                        LobbySign sign = CommonCore.getFactoryRegistry().getLobbySignFactory()
-                                        .createLobbySign(loc, arena.get(),
-                                                arenaJson.getAsJsonObject(arenaEntry.getKey()));
+                                        LobbySign sign =
+                                                ((ILobbySignFactory) FactoryRegistry.getFactory(LobbySign.class))
+                                                        .createLobbySign(loc, arena.get(),
+                                                                arenaJson.getAsJsonObject(arenaEntry.getKey()));
                                         ((CommonArena) arena.get()).getLobbySignMap().put(loc, sign);
                                     } catch (IllegalArgumentException ex) {
                                         CommonCore.logWarning("Found lobby sign in store with invalid "

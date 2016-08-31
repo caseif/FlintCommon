@@ -38,6 +38,10 @@ import net.caseif.flint.common.metadata.CommonMetadata;
 import net.caseif.flint.common.metadata.persist.CommonPersistentMetadataHolder;
 import net.caseif.flint.common.minigame.CommonMinigame;
 import net.caseif.flint.common.util.agent.rollback.IRollbackAgent;
+import net.caseif.flint.common.util.factory.FactoryRegistry;
+import net.caseif.flint.common.util.factory.IArenaFactory;
+import net.caseif.flint.common.util.factory.IRollbackAgentFactory;
+import net.caseif.flint.common.util.factory.IRoundFactory;
 import net.caseif.flint.common.util.file.CommonDataFiles;
 import net.caseif.flint.common.util.helper.JsonHelper;
 import net.caseif.flint.common.util.helper.JsonSerializer;
@@ -145,7 +149,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         Collections.shuffle(this.shuffledSpawns);
         this.boundary = boundary;
 
-        this.rbHelper = CommonCore.getFactoryRegistry().getRollbackAgentFactory().createRollbackAgent(this);
+        this.rbHelper = ((IRollbackAgentFactory) FactoryRegistry.getFactory(IRollbackAgent.class))
+                .createRollbackAgent(this);
         CommonMetadata.getEventBus().register(this);
     }
 
@@ -297,7 +302,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         Preconditions.checkState(!getRound().isPresent(), "Cannot create a round in an arena already hosting one");
         checkArgument(stages != null && !stages.isEmpty(), "LifecycleStage set must not be null or empty");
         ((CommonMinigame) getMinigame()).getRoundMap()
-                .put(this, CommonCore.getFactoryRegistry().getRoundFactory().createRound(this, stages));
+                .put(this, ((IRoundFactory) FactoryRegistry.getFactory(Round.class)).createRound(this, stages));
         Preconditions.checkState(getRound().isPresent(), "Cannot get created round from arena! This is a bug.");
         return getRound().get();
     }
@@ -533,7 +538,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
             Preconditions.checkState(spawnPoints != null && spawnPoints.length > 0,
                     "Spawn points must be set before building");
             Preconditions.checkState(boundary != null, "Boundary must be set before building");
-            return CommonCore.getFactoryRegistry().getArenaFactory().createArena((CommonMinigame) mg, id,
+            return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena((CommonMinigame) mg, id,
                     dispName != null ? dispName : id, spawnPoints, boundary);
         }
 

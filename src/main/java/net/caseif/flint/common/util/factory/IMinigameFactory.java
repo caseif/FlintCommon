@@ -26,7 +26,7 @@ package net.caseif.flint.common.util.factory;
 
 import net.caseif.flint.minigame.Minigame;
 
-public interface IMinigameFactory {
+public interface IMinigameFactory extends Factory<Minigame> {
 
     Minigame createMinigame(String pluginId);
 

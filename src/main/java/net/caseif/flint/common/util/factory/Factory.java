@@ -24,16 +24,5 @@
 
 package net.caseif.flint.common.util.factory;
 
-public interface IFactoryRegistry {
-
-    IMinigameFactory getMinigameFactory();
-
-    IArenaFactory getArenaFactory();
-
-    IRoundFactory getRoundFactory();
-
-    ILobbySignFactory getLobbySignFactory();
-
-    IRollbackAgentFactory getRollbackAgentFactory();
-
+public interface Factory<T> {
 }

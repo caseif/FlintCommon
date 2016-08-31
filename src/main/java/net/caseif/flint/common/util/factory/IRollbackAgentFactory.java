@@ -27,7 +27,7 @@ package net.caseif.flint.common.util.factory;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.util.agent.rollback.IRollbackAgent;
 
-public interface IRollbackAgentFactory {
+public interface IRollbackAgentFactory extends Factory<IRollbackAgent> {
 
     IRollbackAgent createRollbackAgent(Arena arena);
 

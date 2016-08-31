@@ -32,7 +32,8 @@ import net.caseif.flint.common.component.CommonComponent;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.common.util.agent.chat.IChatAgent;
 import net.caseif.flint.common.util.builder.BuilderRegistry;
-import net.caseif.flint.common.util.factory.IFactoryRegistry;
+import net.caseif.flint.common.util.factory.FactoryRegistry;
+import net.caseif.flint.common.util.factory.IMinigameFactory;
 import net.caseif.flint.minigame.Minigame;
 
 import com.google.common.base.Optional;
@@ -67,7 +68,7 @@ public abstract class CommonCore extends FlintCore {
         if (getMinigames().containsKey(pluginId)) {
             throw new IllegalStateException(pluginId + " attempted to register itself more than once");
         }
-        Minigame minigame = getFactoryRegistry0().getMinigameFactory().createMinigame(pluginId);
+        Minigame minigame = ((IMinigameFactory) FactoryRegistry.getFactory(Minigame.class)).createMinigame(pluginId);
         getMinigames().put(pluginId, minigame);
 
         return minigame;
@@ -158,11 +159,5 @@ public abstract class CommonCore extends FlintCore {
     }
 
     protected abstract IChatAgent getChatAgent0();
-
-    protected abstract IFactoryRegistry getFactoryRegistry0();
-
-    public static IFactoryRegistry getFactoryRegistry() {
-        return ((CommonCore) INSTANCE).getFactoryRegistry0();
-    }
 
 }

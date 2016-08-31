@@ -30,7 +30,7 @@ import net.caseif.flint.round.Round;
 
 import com.google.common.collect.ImmutableSet;
 
-public interface IRoundFactory {
+public interface IRoundFactory extends Factory<Round> {
 
     Round createRound(Arena arena, ImmutableSet<LifecycleStage> stages);
 
