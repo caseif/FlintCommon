@@ -23,6 +23,7 @@
  */
 package net.caseif.flint.common.minigame;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
 
 import net.caseif.flint.arena.Arena;
@@ -99,6 +100,8 @@ public abstract class CommonMinigame implements Minigame {
 
     @Override
     public <T> void setConfigValue(ConfigNode<T> node, T value) {
+        checkNotNull(node, "node");
+        checkNotNull(value, "value");
         config.put(node, value);
     }
 

@@ -23,6 +23,8 @@
  */
 package net.caseif.flint.common.round;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.arena.SpawningMode;
 import net.caseif.flint.challenger.Challenger;
@@ -493,6 +495,8 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     @SuppressWarnings("deprecation")
     public <T> void setConfigValue(RoundConfigNode<T> node, T value) throws OrphanedComponentException {
         checkState();
+        checkNotNull(node, "node");
+        checkNotNull(value, "value");
         config.put(node, value);
 
         // compatibility
