@@ -64,7 +64,7 @@ public class FunctionalLobbySignPopulator implements LobbySignPopulator {
         return fourth.apply(sign);
     }
 
-    private static class Builder implements LobbySignPopulator.Builder {
+    public static class Builder implements LobbySignPopulator.Builder {
 
         private static final Function<LobbySign, String> NOOP = new Function<LobbySign, String>() {
             @Override

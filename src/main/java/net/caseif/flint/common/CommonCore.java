@@ -29,11 +29,13 @@ import net.caseif.flint.arena.Arena;
 import net.caseif.flint.challenger.Challenger;
 import net.caseif.flint.common.arena.CommonArena;
 import net.caseif.flint.common.component.CommonComponent;
+import net.caseif.flint.common.lobby.populator.FunctionalLobbySignPopulator;
 import net.caseif.flint.common.util.PlatformUtils;
 import net.caseif.flint.common.util.agent.chat.IChatAgent;
 import net.caseif.flint.common.util.builder.BuilderRegistry;
 import net.caseif.flint.common.util.factory.FactoryRegistry;
 import net.caseif.flint.common.util.factory.IMinigameFactory;
+import net.caseif.flint.lobby.populator.LobbySignPopulator;
 import net.caseif.flint.minigame.Minigame;
 
 import com.google.common.base.Optional;
@@ -60,7 +62,13 @@ public abstract class CommonCore extends FlintCore {
     }
 
     protected static void initializeCommon() {
+        registerBuilders();
+    }
+
+    private static void registerBuilders() {
         BuilderRegistry.instance().registerBuilder(Arena.class, CommonArena.Builder.class);
+        BuilderRegistry.instance().registerBuilder(LobbySignPopulator.class,
+                FunctionalLobbySignPopulator.Builder.class);
     }
 
     @Override
