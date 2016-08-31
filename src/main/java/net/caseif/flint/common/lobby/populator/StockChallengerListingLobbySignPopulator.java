@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package net.caseif.flint.common.lobby.populator;
 
 import net.caseif.flint.config.ConfigNode;

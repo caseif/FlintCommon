@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package net.caseif.flint.common.serialization;
 
 import static net.caseif.flint.common.metadata.persist.CommonPersistentMetadata.PRIMITIVE_PREFIX;
