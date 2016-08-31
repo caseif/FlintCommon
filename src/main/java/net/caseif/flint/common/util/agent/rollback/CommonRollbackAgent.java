@@ -60,10 +60,6 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
     private static final String SQLITE_PROTOCOL = "jdbc:sqlite:";
     private static final Properties SQL_QUERIES = new Properties();
 
-    protected static final int RECORD_TYPE_BLOCK_CHANGED = 0;
-    protected static final int RECORD_TYPE_ENTITY_CREATED = 1;
-    protected static final int RECORD_TYPE_ENTITY_CHANGED = 2;
-
     private final CommonArena arena;
 
     private final File rollbackStore;
@@ -157,24 +153,25 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
     }
 
     @Override
-    public void logChange(int recordType, Location3D location, UUID uuid, String type, int data, String stateSerial)
+    public void logChange(RollbackRecord record)
             throws IOException, SQLException {
-        String world = location.getWorld().isPresent() ? location.getWorld().get() : arena.getWorld();
-        Preconditions.checkNotNull(location, "Location required for all record types");
-        switch (recordType) {
-            case RECORD_TYPE_BLOCK_CHANGED:
-                Preconditions.checkNotNull(type, "Type required for BLOCK_CHANGED record type");
+        String world = record.getLocation().getWorld().isPresent()
+                ? record.getLocation().getWorld().get()
+                : arena.getWorld();
+        Preconditions.checkNotNull(record.getLocation(), "Location required for all record types");
+        switch (record.getType()) {
+            case BLOCK_CHANGE:
+                Preconditions.checkNotNull(record.getTypeData(), "Type required for BLOCK_CHANGED record type");
                 break;
-            case RECORD_TYPE_ENTITY_CREATED:
-                Preconditions.checkNotNull(uuid, "UUID required for ENTITY_CREATED record type");
-                Preconditions.checkNotNull(type, "Type required for ENTITY_CREATED record type");
+            case ENTITY_CREATION:
+                Preconditions.checkNotNull(record.getUuid(), "UUID required for ENTITY_CREATED record type");
                 break;
-            case RECORD_TYPE_ENTITY_CHANGED:
-                Preconditions.checkNotNull(type, "Type required for ENTITY_CHANGED record type");
-                Preconditions.checkNotNull(stateSerial, "State required for ENTITY_CHANGED record type");
+            case ENTITY_CHANGE:
+                Preconditions.checkNotNull(record.getTypeData(), "Type required for ENTITY_CHANGED record type");
+                Preconditions.checkNotNull(record.getStateSerial(), "State required for ENTITY_CHANGED record type");
                 break;
             default:
-                throw new IllegalArgumentException("Undefined record type");
+                throw new AssertionError("Undefined record type");
         }
         if (!rollbackStore.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -182,17 +179,17 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
         }
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + rollbackStore.getPath())) {
             String querySql;
-            switch (recordType) {
-                case RECORD_TYPE_BLOCK_CHANGED:
+            switch (record.getType()) {
+                case BLOCK_CHANGE:
                     querySql = SQL_QUERIES.getProperty("query-by-location")
                             .replace("{world}", "\"" + world + "\"")
-                            .replace("{x}", "" + location.getX())
-                            .replace("{y}", "" + location.getY())
-                            .replace("{z}", "" + location.getZ());
+                            .replace("{x}", "" + record.getLocation().getX())
+                            .replace("{y}", "" + record.getLocation().getY())
+                            .replace("{z}", "" + record.getLocation().getZ());
                     break;
-                case RECORD_TYPE_ENTITY_CHANGED:
+                case ENTITY_CHANGE:
                     querySql = SQL_QUERIES.getProperty("query-by-uuid")
-                            .replace("{uuid}", "\"" + uuid.toString() + "\"");
+                            .replace("{uuid}", "\"" + record.getUuid().toString() + "\"");
                     break;
                 default:
                     querySql = null;
@@ -211,29 +208,29 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
             }
 
             String updateSql;
-            switch (recordType) {
-                case RECORD_TYPE_BLOCK_CHANGED:
+            switch (record.getType()) {
+                case BLOCK_CHANGE:
                     updateSql = SQL_QUERIES.getProperty("insert-block-rollback-record")
                             .replace("{world}", world)
-                            .replace("{x}", "" + location.getX())
-                            .replace("{y}", "" + location.getY())
-                            .replace("{z}", "" + location.getZ())
-                            .replace("{type}", type)
-                            .replace("{data}", "" + data);
+                            .replace("{x}", "" + record.getLocation().getX())
+                            .replace("{y}", "" + record.getLocation().getY())
+                            .replace("{z}", "" + record.getLocation().getZ())
+                            .replace("{type}", record.getTypeData())
+                            .replace("{data}", "" + record.getData());
                     break;
-                case RECORD_TYPE_ENTITY_CREATED:
+                case ENTITY_CREATION:
                     updateSql = SQL_QUERIES.getProperty("insert-entity-created-rollback-record")
                             .replace("{world}", world)
-                            .replace("{uuid}", uuid.toString());
+                            .replace("{uuid}", record.getUuid().toString());
                     break;
-                case RECORD_TYPE_ENTITY_CHANGED:
+                case ENTITY_CHANGE:
                     updateSql = SQL_QUERIES.getProperty("insert-entity-changed-rollback-record")
                             .replace("{world}", world)
-                            .replace("{x}", "" + location.getX())
-                            .replace("{y}", "" + location.getY())
-                            .replace("{z}", "" + location.getZ())
-                            .replace("{uuid}", uuid.toString())
-                            .replace("{type}", type);
+                            .replace("{x}", "" + record.getLocation().getX())
+                            .replace("{y}", "" + record.getLocation().getY())
+                            .replace("{z}", "" + record.getLocation().getZ())
+                            .replace("{uuid}", record.getUuid().toString())
+                            .replace("{type}", record.getTypeData());
                     break;
                 default:
                     throw new AssertionError("Inconsistency detected in method: recordType is in an illegal state. "
@@ -243,8 +240,8 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                 // replace non-negotiable values
                 updateSql = updateSql
                         .replace("{table}", getArena().getId())
-                        .replace("{state}", "" + (stateSerial != null ? 1 : 0))
-                        .replace("{record_type}", "" + recordType);
+                        .replace("{state}", "" + (record.getStateSerial() != null ? 1 : 0))
+                        .replace("{record_type}", "" + record.getType().ordinal());
             }
             int id;
             try (PreparedStatement ps = conn.prepareStatement(updateSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -257,8 +254,8 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                     }
                 }
             }
-            if (stateSerial != null) {
-                saveStateSerial(id, stateSerial);
+            if (record.getStateSerial() != null) {
+                saveStateSerial(id, record.getStateSerial());
             }
         }
     }
@@ -290,7 +287,7 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                         String type = rs.getString("type");
                         int data = rs.getInt("data");
                         boolean state = rs.getBoolean("state");
-                        int recordType = rs.getInt("record_type");
+                        RollbackRecord.Type recordType = RollbackRecord.Type.values()[rs.getInt("record_type")];
 
                         if (world.equals(getArena().getWorld())) {
                             String stateSerial = stateMap.get(id);
@@ -300,13 +297,13 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
                             }
 
                             switch (recordType) {
-                                case RECORD_TYPE_BLOCK_CHANGED:
+                                case BLOCK_CHANGE:
                                     rollbackBlock(id, new Location3D(world, x, y, z), type, data, stateSerial);
                                     break;
-                                case RECORD_TYPE_ENTITY_CREATED:
+                                case ENTITY_CREATION:
                                     rollbackEntityCreation(id, uuid);
                                     break;
-                                case RECORD_TYPE_ENTITY_CHANGED:
+                                case ENTITY_CHANGE:
                                     rollbackEntityChange(id, uuid, new Location3D(world, x, y, z), type, stateSerial);
                                     break;
                                 default:

@@ -43,8 +43,7 @@ public interface IRollbackAgent {
 
     void clearStateStore() throws IOException;
 
-    void logChange(int recordType, Location3D location, UUID uuid, String type, int data, String stateSerial)
-            throws IOException, SQLException;
+    void logChange(RollbackRecord record) throws IOException, SQLException;
 
     void popRollbacks() throws IOException, SQLException;
 
