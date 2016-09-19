@@ -21,10 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-<<<<<<< HEAD
 
-=======
->>>>>>> v1.2.4
 package net.caseif.flint.common.util.factory;
 
 import net.caseif.flint.arena.Arena;

@@ -304,8 +304,8 @@ public abstract class CommonRollbackAgent implements IRollbackAgent {
 
                             switch (recordType) {
                                 case BLOCK_CHANGE:
-                                    blockChangeRecords.add(RollbackRecord.createBlockRecord(id, new Location3D(world, x, y, z),
-                                            type, data, stateSerial));
+                                    blockChangeRecords.add(RollbackRecord.createBlockRecord(id,
+                                            new Location3D(world, x, y, z), type, data, stateSerial));
                                     break;
                                 case ENTITY_CREATION:
                                     entityCreateRecords.add(RollbackRecord.createEntityCreationRecord(id, uuid, world));
