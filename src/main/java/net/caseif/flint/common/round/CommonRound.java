@@ -477,11 +477,12 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
             ((CommonChallenger) challenger).orphan();
         }
 
+        ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
+
         for (LobbySign ls : getArena().getLobbySigns()) {
             ls.update();
         }
 
-        ((CommonMinigame) getArena().getMinigame()).getRoundMap().remove(getArena());
         this.orphan();
     }
 
