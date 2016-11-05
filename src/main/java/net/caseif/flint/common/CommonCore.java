@@ -58,9 +58,6 @@ public abstract class CommonCore extends FlintCore {
      */
     public static PlatformUtils PLATFORM_UTILS;
 
-    static {
-    }
-
     protected static void initializeCommon() {
         registerBuilders();
     }
