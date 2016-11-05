@@ -152,6 +152,7 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         this.rbHelper = ((IRollbackAgentFactory) FactoryRegistry.getFactory(IRollbackAgent.class))
                 .createRollbackAgent(this);
         CommonMetadata.getEventBus().register(this);
+        parent.getArenaMap().put(id.toLowerCase(), this);
     }
 
     @Override
@@ -538,6 +539,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
             Preconditions.checkState(spawnPoints != null && spawnPoints.length > 0,
                     "Spawn points must be set before building");
             Preconditions.checkState(boundary != null, "Boundary must be set before building");
+            checkArgument(((CommonMinigame) mg).getArenaMap().containsKey(id),
+                    "Cannot create arena: arena with ID \"" + id + "\" already exists");
             return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena((CommonMinigame) mg, id,
                     dispName != null ? dispName : id, spawnPoints, boundary);
         }
