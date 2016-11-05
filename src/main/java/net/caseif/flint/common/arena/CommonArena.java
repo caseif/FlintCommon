@@ -112,6 +112,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
         assert name != null;
         checkArgument(spawnPoints != null && spawnPoints.length > 0,
                 "Initial spawn for arena \"" + id + "\" must not be null or empty");
+        checkArgument(!parent.getArenaMap().containsKey(id),
+                "Cannot create arena: arena with ID \"" + id + "\" already exists");
         String world = null;
         for (Location3D spawn : spawnPoints) {
             if (spawn.getWorld().isPresent()) {
@@ -153,6 +155,11 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
                 .createRollbackAgent(this);
         CommonMetadata.getEventBus().register(this);
         parent.getArenaMap().put(id.toLowerCase(), this);
+        try {
+            this.store();
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to store new arena with ID " + id, ex);
+        }
     }
 
     @Override
@@ -539,8 +546,6 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
             Preconditions.checkState(spawnPoints != null && spawnPoints.length > 0,
                     "Spawn points must be set before building");
             Preconditions.checkState(boundary != null, "Boundary must be set before building");
-            checkArgument(((CommonMinigame) mg).getArenaMap().containsKey(id),
-                    "Cannot create arena: arena with ID \"" + id + "\" already exists");
             return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena((CommonMinigame) mg, id,
                     dispName != null ? dispName : id, spawnPoints, boundary);
         }
