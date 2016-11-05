@@ -120,6 +120,13 @@ public abstract class CommonMinigame implements Minigame {
     }
 
     @Override
+    public Arena createArena(String id, String name, Location3D spawnPoint, Boundary boundary)
+            throws IllegalArgumentException {
+        return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena(this, id, name,
+                new Location3D[] {spawnPoint}, boundary);
+    }
+
+    @Override
     public Arena createArena(String id, Location3D spawnPoint, Boundary boundary) throws IllegalArgumentException {
         return createArena(id, id, spawnPoint, boundary);
     }
