@@ -200,6 +200,8 @@ public abstract class CommonMinigame implements Minigame {
                         );
                         arena.getSpawnPointMap().remove(0); // remove initial placeholder spawn
                         arena.configure(arenaJson);
+                        // force save
+                        arena.store();
                         getArenaMap().put(arena.getId(), arena);
                     } else {
                         CommonCore.logWarning("Invalid object \"" + entry.getKey() + "\"in arena store");
