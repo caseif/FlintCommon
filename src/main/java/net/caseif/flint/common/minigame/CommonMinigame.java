@@ -122,8 +122,15 @@ public abstract class CommonMinigame implements Minigame {
     @Override
     public Arena createArena(String id, String name, Location3D spawnPoint, Boundary boundary)
             throws IllegalArgumentException {
-        return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena(this, id, name,
-                new Location3D[] {spawnPoint}, boundary);
+        CommonArena arena = ((IArenaFactory) FactoryRegistry.getFactory(Arena.class))
+                .createArena(this, id, name, new Location3D[] {spawnPoint}, boundary);
+        try {
+            arena.store();
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to store arena with ID " + id + ".", ex);
+        }
+
+        return arena;
     }
 
     @Override
@@ -200,7 +207,6 @@ public abstract class CommonMinigame implements Minigame {
                         );
                         arena.getSpawnPointMap().remove(0); // remove initial placeholder spawn
                         arena.configure(arenaJson);
-                        getArenaMap().put(arena.getId(), arena);
                     } else {
                         CommonCore.logWarning("Invalid object \"" + entry.getKey() + "\"in arena store");
                     }
