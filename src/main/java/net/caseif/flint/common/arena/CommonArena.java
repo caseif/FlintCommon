@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static net.caseif.flint.common.util.helper.JsonSerializer.deserializeLocation;
 import static net.caseif.flint.common.util.helper.JsonSerializer.serializeLocation;
 
+import net.caseif.flint.FlintCore;
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.component.CommonComponent;
@@ -155,11 +156,6 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
                 .createRollbackAgent(this);
         CommonMetadata.getEventBus().register(this);
         parent.getArenaMap().put(id.toLowerCase(), this);
-        try {
-            this.store();
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to store new arena with ID " + id, ex);
-        }
     }
 
     @Override
@@ -445,6 +441,8 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
      *     persistent store
      */
     public void store() throws IOException {
+        CommonCore.logInfo("Storing");
+
         File arenaStore = CommonDataFiles.ARENA_STORE.getFile(getMinigame());
 
         JsonObject json = JsonHelper.readOrCreateJson(arenaStore);
@@ -546,8 +544,15 @@ public abstract class CommonArena extends CommonPersistentMetadataHolder impleme
             Preconditions.checkState(spawnPoints != null && spawnPoints.length > 0,
                     "Spawn points must be set before building");
             Preconditions.checkState(boundary != null, "Boundary must be set before building");
-            return ((IArenaFactory) FactoryRegistry.getFactory(Arena.class)).createArena((CommonMinigame) mg, id,
-                    dispName != null ? dispName : id, spawnPoints, boundary);
+
+            CommonArena arena = ((IArenaFactory) FactoryRegistry.getFactory(Arena.class))
+                    .createArena((CommonMinigame) mg, id, dispName != null ? dispName : id, spawnPoints, boundary);
+            try {
+                arena.store();
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to store arena with ID " + id + ".", ex);
+            }
+            return arena;
         }
 
     }
