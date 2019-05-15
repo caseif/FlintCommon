@@ -425,7 +425,7 @@ public abstract class CommonRound extends CommonMetadataHolder implements Round,
     }
 
     @Override
-    public void end() throws IllegalStateException, OrphanedComponentException {
+    public void _INVALID_end() throws IllegalStateException, OrphanedComponentException {
         checkState();
         end(new EndParameter[]{});
     }
