@@ -81,6 +81,9 @@ public class SimpleMetadataSerializer<T> implements Serializer<T> {
                     return (T) Float.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2));
                 case 'D':
                     return (T) Double.valueOf(str.substring(PRIMITIVE_PREFIX.length() + 2));
+                default:
+                    throw new IllegalArgumentException("Bad primitive magic `"
+                            + str.charAt(PRIMITIVE_PREFIX.length()) + "`");
             }
         }
         return (T) str;
