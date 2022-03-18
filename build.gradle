@@ -1,12 +1,12 @@
 plugins {
     id 'java'
-    id 'maven'
+    id 'maven-publish'
     id 'eclipse'
     id 'idea'
     id 'checkstyle'
-    id 'net.minecrell.licenser' version '0.4.1'
-    id 'com.github.johnrengelman.shadow' version '5.0.0'
-    id 'blue.lapis.methodremapper' version '0.2'
+    id 'org.cadixdev.licenser' version '0.6.1'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'net.caseif.methodremapper' version '0.3-SNAPSHOT'
 }
 
 defaultTasks 'clean', 'updateLicenses', 'build', 'shadowJar'
@@ -36,7 +36,7 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'http://repo.caseif.net/content/groups/public/' }
+    maven { url 'https://repo.caseif.net/content/groups/public/' }
 }
 
 ext {
@@ -61,8 +61,8 @@ ext {
 
 // Project dependencies
 dependencies {
-    compile guava
-    compile gson
+    implementation guava
+    implementation gson
     shadow flint
 
     deployerJars 'org.apache.maven.wagon:wagon-ssh:3.3.2'
@@ -124,7 +124,7 @@ shadowJar {
 }
 
 remap {
-    inputTask = tasks.shadowJar
+    inputJar = tasks.shadowJar.archiveFile.getAsFile().get()
     config = project.file('etc/remap.txt')
 }
 
@@ -139,39 +139,31 @@ artifacts {
     archives sourceJar
 }
 
-uploadArchives {
-    repositories.mavenDeployer {
-        configuration = configurations.deployerJars
-        if (project.hasProperty('mavenRepo')) {
-            repository(url: project.property('mavenRepo')) {
-                if (project.hasProperty('mavenPrivKey')) {
-                    authentication(userName: project.property('mavenUser'), privateKey: project.property('mavenPrivKey'))
-                } else {
-                    authentication(userName: project.property('mavenUser'), password: project.property('mavenPass'))
-                }
-            }
-        }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
 
-        pom {
-            groupId = project.group
-            version = project.version
-            artifactId = project.ext.projectName
-            project {
-                packaging 'jar'
-                description project.ext.description
-                url 'http://github.com/caseif/FlintCommon'
+            pom {
+                groupId = project.group
+                version = project.version
+                artifactId = project.ext.projectName
+
+                packaging = 'jar'
+                description = project.ext.description
+                url = 'http://github.com/caseif/FlintCommon'
 
                 scm {
-                    url 'https://github.com/caseif/FlintCommon'
-                    connection 'scm:git:git://github.com/caseif/FlintCommon.git'
-                    developerConnection 'scm:git:git@github.com:caseif/FlintCommon.git'
+                    url = 'https://github.com/caseif/FlintCommon'
+                    connection = 'scm:git:git://github.com/caseif/FlintCommon.git'
+                    developerConnection = 'scm:git:git@github.com:caseif/FlintCommon.git'
                 }
 
                 licenses {
                     license {
-                        name 'BSD 3-Clause'
-                        url 'http://opensource.org/licenses/BSD-3-clause'
-                        distribution 'repo'
+                        name = 'MIT'
+                        url = 'http://opensource.org/licenses/MIT'
+                        distribution = 'repo'
                     }
                 }
             }

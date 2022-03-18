@@ -24,8 +24,6 @@
 
 package net.caseif.flint.common.lobby;
 
-import static javafx.scene.input.KeyCode.R;
-
 import net.caseif.flint.arena.Arena;
 import net.caseif.flint.common.CommonCore;
 import net.caseif.flint.common.arena.CommonArena;
