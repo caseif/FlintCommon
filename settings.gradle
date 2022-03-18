@@ -1,7 +1,8 @@
 pluginManagement {
     repositories {
-        mavenLocal()
-        mavenCentral()
+        maven {
+            url ="https://repo.caseif.net"
+        }
         gradlePluginPortal()
     }
 }
