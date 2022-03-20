@@ -79,9 +79,9 @@ tasks.withType<Jar> {
         attributes["Specification-Title"] = project("Flint").name
         attributes["Specification-Version"] = project("Flint").version
         attributes["Specification-Vendor"] = project("Flint").extra["author"]
-        attributes["Implementation-Title"] = rootProject.name
-        attributes["Implementation-Version"] = version
-        attributes["Implementation-Vendor"] = author
+        attributes["Implementation-Title"] = project.name
+        attributes["Implementation-Version"] = project.version
+        attributes["Implementation-Vendor"] = project.extra["author"]
     }
 }
 
