@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import blue.lapis.methodremapper.gradle.RemapTask
 
 plugins {
-    java
+    `java-library`
     `maven-publish`
     eclipse
     idea
@@ -40,7 +40,7 @@ repositories {
 dependencies {
     shadow("com.google.guava:guava:17.0")
     shadow("com.google.code.gson:gson:2.2.4")
-    implementation(project(":Flint"))
+    api(project("Flint"))
 }
 
 // Read source files using UTF-8
@@ -76,9 +76,9 @@ tasks.withType<Jar> {
     classifier = "base"
     manifest {
         attributes["Created-By"] = "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
-        attributes["Specification-Title"] = project(":Flint").name
-        attributes["Specification-Version"] = project(":Flint").version
-        attributes["Specification-Vendor"] = project(":Flint").extra["author"]
+        attributes["Specification-Title"] = project("Flint").name
+        attributes["Specification-Version"] = project("Flint").version
+        attributes["Specification-Vendor"] = project("Flint").extra["author"]
         attributes["Implementation-Title"] = rootProject.name
         attributes["Implementation-Version"] = version
         attributes["Implementation-Vendor"] = author
