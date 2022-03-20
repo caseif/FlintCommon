@@ -14,17 +14,17 @@ plugins {
 
 defaultTasks("clean", "updateLicenses", "build", "shadowJar")
 
+evaluationDependsOnChildren()
+
 // Project information
 group = "net.caseif.flint.common"
 version = "1.3.6"
 description = "Code shared across implementations of Flint."
 
 // Extended project information
-val projectName by extra { "flintcommon" }
-val inceptionYear by extra { "2015" }
-val packaging by extra { "jar" }
-val author by extra { "Max Roncace" }
-val flintVersion by extra { "1.3.2" }
+val inceptionYear: String by extra { "2015" }
+val packaging: String by extra { "jar" }
+val author: String by extra { "Max Roncace" }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_7
@@ -33,16 +33,14 @@ java {
 
 // Project repositories
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven("https://repo.caseif.net/content/groups/public/")
 }
 
 // Project dependencies
 dependencies {
     shadow("com.google.guava:guava:17.0")
     shadow("com.google.code.gson:gson:2.2.4")
-    implementation("net.caseif.flint:flint:" + flintVersion)
+    implementation(project(":Flint"))
 }
 
 // Read source files using UTF-8
@@ -70,14 +68,18 @@ tasks.withType<Checkstyle> {
     exclude("**/*.yml")
 }
 
+tasks.withType<Javadoc> {
+    enabled = false
+}
+
 tasks.withType<Jar> {
     classifier = "base"
     manifest {
-        attributes["Created-By"] = System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")"
-        attributes["Specification-Title"] = "Flint"
-        attributes["Specification-Version"] = flintVersion
-        attributes["Specification-Vendor"] = "Max Roncace"
-        attributes["Implementation-Title"] = name
+        attributes["Created-By"] = "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
+        attributes["Specification-Title"] = project(":Flint").name
+        attributes["Specification-Version"] = project(":Flint").version
+        attributes["Specification-Vendor"] = project(":Flint").extra["author"]
+        attributes["Implementation-Title"] = rootProject.name
         attributes["Implementation-Version"] = version
         attributes["Implementation-Vendor"] = author
     }
@@ -118,7 +120,7 @@ publishing {
             pom {
                 groupId = project.group as String
                 version = project.version as String
-                artifactId = projectName
+                artifactId = project.name as String
 
                 packaging = packaging
                 description.set(description)
