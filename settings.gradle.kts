@@ -5,6 +5,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "FlintCommon"
+rootProject.name = "flintcommon"
 
-include("Flint")
+include("flint")

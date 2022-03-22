@@ -40,7 +40,7 @@ repositories {
 dependencies {
     shadow("com.google.guava:guava:17.0")
     shadow("com.google.code.gson:gson:2.2.4")
-    api(project("Flint"))
+    api(project("flint"))
 }
 
 // Read source files using UTF-8
@@ -76,9 +76,9 @@ tasks.withType<Jar> {
     classifier = "base"
     manifest {
         attributes["Created-By"] = "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
-        attributes["Specification-Title"] = project("Flint").name
-        attributes["Specification-Version"] = project("Flint").version
-        attributes["Specification-Vendor"] = project("Flint").extra["author"]
+        attributes["Specification-Title"] = project("flint").name
+        attributes["Specification-Version"] = project("flint").version
+        attributes["Specification-Vendor"] = project("flint").extra["author"]
         attributes["Implementation-Title"] = project.name
         attributes["Implementation-Version"] = project.version
         attributes["Implementation-Vendor"] = project.extra["author"]
@@ -123,8 +123,9 @@ publishing {
                 artifactId = project.name as String
 
                 packaging = packaging
-                description.set(description)
+                description.set(project.description)
                 url.set("http://github.com/caseif/FlintCommon")
+                inceptionYear.set(project.extra["inceptionYear"] as String)
 
                 scm {
                     url.set("https://github.com/caseif/FlintCommon")
