@@ -73,7 +73,7 @@ tasks.withType<Javadoc> {
 }
 
 tasks.withType<Jar> {
-    classifier = "base"
+    archiveClassifier.set("base")
     manifest {
         attributes["Created-By"] = "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
         attributes["Specification-Title"] = project("flint").name
@@ -87,11 +87,9 @@ tasks.withType<Jar> {
 
 tasks.withType<ShadowJar> {
     dependencies {
-        exclude(dependency("com.google.guava:guava"))
-        exclude(dependency("com.google.code.gson:gson"))
-        exclude(dependency("org.bukkit:bukkit"))
+        include(project("flint"))
     }
-    classifier = ""
+    archiveClassifier.set("")
 
     finalizedBy(tasks.remap)
 }
@@ -99,7 +97,7 @@ tasks.withType<ShadowJar> {
 tasks.create<Jar>("sourceJar") {
     from(sourceSets["main"].java)
     from(sourceSets["main"].resources)
-    classifier = "sources"
+    archiveClassifier.set("sources")
 }
 
 tasks.named<RemapTask>("remap") {
