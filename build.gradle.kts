@@ -118,7 +118,7 @@ publishing {
             pom {
                 groupId = project.group as String
                 version = project.version as String
-                artifactId = project.name as String
+                artifactId = project.name
 
                 packaging = packaging
                 description.set(project.description)
